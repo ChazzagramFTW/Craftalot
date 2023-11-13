@@ -8,6 +8,6 @@ This gamemode generally requires a group of atleast 8 players or more to be full
 # Support
 Links to support this project and some socials:
 
-- Spigot Page: ...
-- Twitter: https://twitter.com/Chazzagram
-- Wiki Page: ...
+- [Spigot Page](https://github.com/ChazzagramFTW/Craftalot)
+- [Twitter](https://twitter.com/Chazzagram)
+- [Wiki Page](https://github.com/ChazzagramFTW/Craftalot)
