@@ -1,0 +1,12 @@
+me\chazzagram\craftalot\commands\craftalotCommand$1.class
+me\chazzagram\craftalot\commands\SpawnCommand.class
+me\chazzagram\craftalot\commands\setSpawnCommand.class
+me\chazzagram\craftalot\commands\craftalotCommand.class
+me\chazzagram\craftalot\Craftalot.class
+me\chazzagram\craftalot\listeners\ShearSheepListener.class
+me\chazzagram\craftalot\listeners\SpawnListener.class
+me\chazzagram\craftalot\listeners\craftalotGUIListener.class
+me\chazzagram\craftalot\listeners\XPBottleBreakListener.class
+me\chazzagram\craftalot\commands\GodCommand.class
+me\chazzagram\craftalot\commands\spawnOnJoinCommand.class
+me\chazzagram\craftalot\commands\RepeatCommand.class
