@@ -10,4 +10,4 @@ Links to support this project and some socials:
 
 - [Spigot Page](https://github.com/ChazzagramFTW/Craftalot)
 - [Twitter](https://twitter.com/Chazzagram)
-- [Wiki Page]([https://github.com/ChazzagramFTW/Craftalot/wiki])
+- [Wiki Page](https://github.com/ChazzagramFTW/Craftalot/wiki)
