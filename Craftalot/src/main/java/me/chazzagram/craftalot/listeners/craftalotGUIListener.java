@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.listeners;
 
 import me.chazzagram.craftalot.Craftalot;
+import me.chazzagram.craftalot.files.CraftlistConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -31,7 +32,7 @@ public class craftalotGUIListener implements Listener {
                 p.sendMessage("§7Loading interface..");
                 p.closeInventory();
                 for (int i = 0; i <= 32; i++){
-                    itemSelected = plugin.getConfig().getItemStack("craftalot.craftlist.item" + i);
+                    itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
                     if(itemSelected != null){
                         gui.setItem(i, itemSelected);
                     }
@@ -45,8 +46,8 @@ public class craftalotGUIListener implements Listener {
         }
 
         if(e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")){
-            plugin.getConfig().set("craftalot.craftlist.item" + e.getSlot(), gui.getItem(e.getSlot()));
-            plugin.saveConfig();
+            CraftlistConfig.get().set("craftlist.item" + e.getSlot(), gui.getItem(e.getSlot()));
+            CraftlistConfig.save();
         }
     }
 
@@ -55,8 +56,8 @@ public class craftalotGUIListener implements Listener {
 
         if(e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")){
             for (int i = 0; i <= 32; i++) {
-                plugin.getConfig().set("craftalot.craftlist.item" + i, gui.getItem(i));
-                plugin.saveConfig();
+                CraftlistConfig.get().set("craftlist.item" + i, gui.getItem(i));
+                CraftlistConfig.save();
             }
         }
     }
@@ -66,8 +67,8 @@ public class craftalotGUIListener implements Listener {
 
         if(e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")){
             for (int i = 0; i <= 32; i++) {
-                plugin.getConfig().set("craftalot.craftlist.item" + i, gui.getItem(i));
-                plugin.saveConfig();
+                CraftlistConfig.get().set("craftlist.item" + i, gui.getItem(i));
+                CraftlistConfig.save();
             }
         }
     }

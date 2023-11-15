@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot;
 
 import me.chazzagram.craftalot.commands.*;
+import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.listeners.ShearSheepListener;
 import me.chazzagram.craftalot.listeners.SpawnListener;
 import me.chazzagram.craftalot.listeners.XPBottleBreakListener;
@@ -45,6 +46,11 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
 
         // config
+        CraftlistConfig.setup();
+        CraftlistConfig.get().addDefault("craftlist", "");
+        CraftlistConfig.get().options().copyDefaults();
+        CraftlistConfig.save();
+
         getConfig().options().copyDefaults();
         saveDefaultConfig();
 

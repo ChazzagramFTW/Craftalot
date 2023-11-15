@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="craftalot:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/craftalot_jar</output-path>
+    <root id="archive" name="craftalot.jar">
+      <element id="module-output" name="craftalot" />
+    </root>
+  </artifact>
+</component>

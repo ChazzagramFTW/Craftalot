@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.commands;
 
 import me.chazzagram.craftalot.Craftalot;
+import me.chazzagram.craftalot.files.CraftlistConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -18,14 +19,20 @@ import java.util.List;
 
 /*
 Plugin Wish List:
-- Create a GUI
-- Add an in-game craft list in the GUI which acts like a chest of items.
+- COMPLETE! Create a GUI
+- COMPLETE! Add an in-game craft list in the GUI which acts like a chest of items.
 - COMPLETE! Set up an Edguard NPC which can be spawned/despawned and moved.
 - Create essential placeholders.
 - Add a settings toggle in the GUI, toggle/change settings such as time limit, day/night, player visibility, material restocking delay, points etc.
 - Add teleportation settings, such as lobby location, map location, waiting location.
 - Add game start/pause/end functions.
 - Potentially add an item frame recipe board?*
+
+Issues:
+- Edguard's entity does not remain the same when the server is restarted.
+- Edguard can be hurt.
+- /ca list now does not function properly.
+- /ca gui creates invalid command message yet still works.
 
 */
 
@@ -52,7 +59,7 @@ public class craftalotCommand implements CommandExecutor {
             } else {
                 switch (args[0].toLowerCase()) {
                     case "list":
-                        List<String> craftableItems = this.plugin.getConfig().getStringList("craftalot.craftlist");
+                        List<String> craftableItems = this.plugin.getConfig().getStringList("craftlist");
                         p.sendMessage("§6List of items to be crafted:");
                         for (String craftableItem : craftableItems) {
                             p.sendMessage("§a- " + craftableItem);
@@ -134,8 +141,8 @@ public class craftalotCommand implements CommandExecutor {
                         craftlist_meta.setLore(craftlist_lore);
                         craftlist.setItemMeta(craftlist_meta);
 
-                        plugin.getConfig().set("craftalot.craftlist.item1", craftlist);
-                        plugin.saveConfig();
+                        CraftlistConfig.get().set("craftlist.item1", craftlist);
+                        CraftlistConfig.save();
 
                         ItemMeta edguard_meta = edguard.getItemMeta();
                         edguard_meta.setDisplayName("§eEdguard");
