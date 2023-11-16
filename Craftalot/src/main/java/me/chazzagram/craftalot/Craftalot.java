@@ -54,12 +54,16 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getConfig().options().copyDefaults();
         saveDefaultConfig();
 
+        craftalotCommand.spawnEdguard();
+
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         System.out.println("My first plugin has stopped, bye.");
+
+        craftalotCommand.despawnEdguard();
 
     }
 

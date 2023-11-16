@@ -17,6 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.bukkit.Bukkit.getServer;
+
 /*
 Plugin Wish List:
 - COMPLETE! Create a GUI
@@ -29,8 +31,9 @@ Plugin Wish List:
 - Potentially add an item frame recipe board?*
 
 Issues:
-- Edguard's entity does not remain the same when the server is restarted.
+- COMPLETE! Edguard's entity does not remain the same when the server is restarted.
 - Edguard can be hurt.
+- COMPLETE! Edguard can be summoned multiple times.
 - /ca list now does not function properly.
 - /ca gui creates invalid command message yet still works.
 
@@ -38,14 +41,41 @@ Issues:
 
 public class craftalotCommand implements CommandExecutor {
 
-    Entity edguard;
-    int count = 0;
-    boolean schedule = false;
+    static public Entity edguard;
+    static int count = 0;
+    static boolean schedule = false;
 
-    private final Craftalot plugin;
+    private static Craftalot plugin;
 
     public craftalotCommand(Craftalot plugin) {
         this.plugin = plugin;
+    }
+
+    public static void spawnEdguard(){
+
+        edguard = Bukkit.getWorld(plugin.getConfig().getString("craftalot.edguard-location.world")).spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+
+        edguard.setGravity(false);
+        edguard.setCustomName("§aEdguard");
+        edguard.setCustomNameVisible(true);
+        edguard.setInvulnerable(true);
+        PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 99999999, 99999999, false, false);
+
+        schedule = true;
+        count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                if (!schedule) {
+                    Bukkit.getScheduler().cancelTask(count); } else {
+                    edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                }
+            }
+        }, 20L, 0);
+    }
+
+    public static void despawnEdguard(){
+        schedule = false;
+        edguard.remove();
     }
 
     @Override
@@ -82,40 +112,37 @@ public class craftalotCommand implements CommandExecutor {
                         if(args.length > 1) {
                             switch (args[1].toLowerCase()) {
                                 case "spawn":
-                                    edguard = p.getWorld().spawnEntity(p.getLocation(), EntityType.VILLAGER);
 
-                                    plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
-                                    plugin.saveConfig();
+                                    if (schedule == false){
 
-                                    edguard.setGravity(false);
-                                    edguard.setCustomName("§aEdguard");
-                                    edguard.setCustomNameVisible(true);
-                                    edguard.setInvulnerable(true);
-                                    PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 99999999, 99999999, false, false);
+                                        plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
+                                        plugin.saveConfig();
 
-                                    schedule = true;
-                                    count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (!schedule) {
-                                                Bukkit.getScheduler().cancelTask(count); } else {
-                                                edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
-                                            }
-                                        }
-                                    }, 20L, 0);
+                                        spawnEdguard();
 
-                                    p.sendMessage("Edguard has been spawned at your location!");
+                                        p.sendMessage("Edguard has been spawned at your location!");
+                                    } else {
+                                        p.sendMessage("Edguard already exists in the world! Use '/ca edguard movehere' to teleport him to your location.");
+                                    }
+
                                     break;
                                 case "despawn":
-                                    schedule = false;
-                                    edguard.remove();
-                                    p.sendMessage("Edguard has been despawned!");
+                                    if (schedule == true) {
+                                        despawnEdguard();
+                                        p.sendMessage("Edguard has been despawned!");
+                                    } else {
+                                        p.sendMessage("Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                                    }
                                     break;
                                 case "movehere":
-                                    plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
-                                    plugin.saveConfig();
-                                    edguard.teleport(p.getLocation());
-                                    p.sendMessage("Edguard has been teleported to your location!");
+                                    if (schedule == true) {
+                                        plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
+                                        plugin.saveConfig();
+                                        edguard.teleport(p.getLocation());
+                                        p.sendMessage("Edguard has been teleported to your location!");
+                                    } else {
+                                        p.sendMessage("Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                                    }
                                     break;
                                 default:
                                     p.sendMessage("§6Incorrect Arguement!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
@@ -163,6 +190,7 @@ public class craftalotCommand implements CommandExecutor {
 
 
                         p.openInventory(gui);
+                        break;
 
 
 
