@@ -36,6 +36,7 @@ Issues:
 - COMPLETE! Edguard can be summoned multiple times.
 - /ca list now does not function properly.
 - /ca gui creates invalid command message yet still works.
+- COMPLETE! /ca reload command.
 
 */
 
@@ -105,6 +106,7 @@ public class craftalotCommand implements CommandExecutor {
                                 "\n§6/ca help: §fThis page! Congrats!\n§7§oUsage: /craftalot help {1,2,3..}" +
                                 "\n§6/ca list: §fList the craftable items.\n§7§oUsage: /craftalot list" +
                                 "\n§6/ca edguard: §fCommand to control the item collector Edguard.\n§7§oUsage: /craftalot edguard {spawn,despawn,movehere}" +
+                                "\n§6/ca reload: §fReloads the craftlist in the config. \n§7§oUsage: /craftalot reload" +
                                 "\n§6/ca version: §fCheck what version the plugin is running on.\n§7§oUsage: /craftalot version"
                         );
                         break;
@@ -190,6 +192,11 @@ public class craftalotCommand implements CommandExecutor {
 
 
                         p.openInventory(gui);
+                        break;
+
+                    case "reload":
+                        CraftlistConfig.reload();
+                        p.sendMessage("Craftlist.yml reloaded.");
                         break;
 
 
