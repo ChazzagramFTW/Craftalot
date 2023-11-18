@@ -30,6 +30,14 @@ Plugin Wish List:
 - Add game start/pause/end functions.
 - Potentially add an item frame recipe board?*
 
+Settings:
+- Time Limit
+- Spawn Points: Lobby, Map, Waiting
+- Day/Night
+- Player Visibility
+- Material Restock Delay
+- Point Distribution
+
 Issues:
 - COMPLETE! Edguard's entity does not remain the same when the server is restarted.
 - Edguard can be hurt.

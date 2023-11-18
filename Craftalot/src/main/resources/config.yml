@@ -6,49 +6,46 @@ spawnOnJoin: 'true'
 
 # ------ Craftalot Config ------
 craftalot:
-  # Item craft list, list out all the materials which players will be prompted to craft.
-  # It is recommended to have at least 2 materials per minute of play.
-  # Visit https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for the correct format.
-  craftlist:
-    item1:
-    item2:
-    item3:
-    item4:
-    item5:
-    item6:
-    item7:
-    item8:
-    item9:
-    item10:
-    item11:
-    item12:
-    item13:
-    item14:
-    item15:
-    item16:
-    item17:
-    item18:
-    item19:
-    item20:
-    item21:
-    item22:
-    item23:
-    item24:
-    item25:
-    item26:
-    item27:
-    item28:
-    item29:
-    item30:
-    item31:
-    item32:
 
   # Set how long the game will last for in seconds.
   # Default: 600 (10 minutes)
   time-limit-in-seconds: 600
 
+  # Set where players will be teleported before the game begins.
+  # This feature is set in-game using /ca gui.
+  lobby-location:
+
+  # Set where players will be teleported when the game begins.
+  # This feature is set in-game using /ca gui.
+  game-begin-location:
+
+  # Configuration location for the Edguard entity.
+  # It is recommended to leave this setting unchanged.
+  # Use '/ca edguard' in-game to modify Edguard's properties.
   edguard-location:
     x: 0
     y: 0
     z: 0
     world: world
+
+  # Set the time of day which the game will be played in.
+  # Syntax (day, night)
+  # Default: day
+  time-of-day: day
+
+  # Whether players are visible to each other while playing.
+  # Syntax (true, false)
+  # Default: true
+  player-visibility: true
+
+  # Point system configuration
+  points:
+
+    # Enable/Disable points.
+    # Syntax (true, false)
+    # Default: true
+    enabled: true
+
+    # Points per item crafted.
+    # Default: 1
+    per-craft: 1
