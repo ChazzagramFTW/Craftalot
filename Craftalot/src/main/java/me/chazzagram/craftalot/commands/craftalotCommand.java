@@ -11,13 +11,9 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.bukkit.Bukkit.getServer;
 
 /*
 Plugin Wish List:
@@ -62,24 +58,26 @@ public class craftalotCommand implements CommandExecutor {
 
     public static void spawnEdguard(){
 
-        edguard = Bukkit.getWorld(plugin.getConfig().getString("craftalot.edguard-location.world")).spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+        if(plugin.getConfig().getString("craftalot.edguard-location.world") != null) {
+            edguard = Bukkit.getWorld(plugin.getConfig().getString("craftalot.edguard-location.world")).spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
 
-        edguard.setGravity(false);
-        edguard.setCustomName("§aEdguard");
-        edguard.setCustomNameVisible(true);
-        edguard.setInvulnerable(true);
-        PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 99999999, 99999999, false, false);
+            edguard.setGravity(false);
+            edguard.setCustomName("§aEdguard");
+            edguard.setCustomNameVisible(true);
+            edguard.setInvulnerable(true);
 
-        schedule = true;
-        count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                if (!schedule) {
-                    Bukkit.getScheduler().cancelTask(count); } else {
-                    edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+            schedule = true;
+            count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    if (!schedule) {
+                        Bukkit.getScheduler().cancelTask(count);
+                    } else {
+                        edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                    }
                 }
-            }
-        }, 20L, 0);
+            }, 20L, 0);
+        }
     }
 
     public static void despawnEdguard(){
@@ -98,7 +96,7 @@ public class craftalotCommand implements CommandExecutor {
             } else {
                 switch (args[0].toLowerCase()) {
                     case "list":
-                        List<String> craftableItems = this.plugin.getConfig().getStringList("craftlist");
+                        List<String> craftableItems = plugin.getConfig().getStringList("craftlist");
                         p.sendMessage("§6List of items to be crafted:");
                         for (String craftableItem : craftableItems) {
                             p.sendMessage("§a- " + craftableItem);
@@ -110,12 +108,19 @@ public class craftalotCommand implements CommandExecutor {
                         break;
                     case "help":
                         p.sendMessage(
-                                "§7--- Craftalot Commands ---" +
-                                "\n§6/ca help: §fThis page! Congrats!\n§7§oUsage: /craftalot help {1,2,3..}" +
-                                "\n§6/ca list: §fList the craftable items.\n§7§oUsage: /craftalot list" +
-                                "\n§6/ca edguard: §fCommand to control the item collector Edguard.\n§7§oUsage: /craftalot edguard {spawn,despawn,movehere}" +
-                                "\n§6/ca reload: §fReloads the craftlist in the config. \n§7§oUsage: /craftalot reload" +
-                                "\n§6/ca version: §fCheck what version the plugin is running on.\n§7§oUsage: /craftalot version"
+                                """
+                                        §7--- Craftalot Commands ---
+                                        §6/ca help: §fThis page! Congrats!
+                                        §7§oUsage: /craftalot help {1,2,3..}
+                                        §6/ca list: §fList the craftable items.
+                                        §7§oUsage: /craftalot list
+                                        §6/ca edguard: §fCommand to control the item collector Edguard.
+                                        §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
+                                        §6/ca reload: §fReloads the craftlist in the config.\s
+                                        §7§oUsage: /craftalot reload
+                                        §6/ca version: §fCheck what version the plugin is running on.
+                                        §7§oUsage: /craftalot version
+                                """
                         );
                         break;
                     case "edguard":
@@ -123,7 +128,7 @@ public class craftalotCommand implements CommandExecutor {
                             switch (args[1].toLowerCase()) {
                                 case "spawn":
 
-                                    if (schedule == false){
+                                    if (!schedule){
 
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                                         plugin.saveConfig();
@@ -137,7 +142,7 @@ public class craftalotCommand implements CommandExecutor {
 
                                     break;
                                 case "despawn":
-                                    if (schedule == true) {
+                                    if (schedule) {
                                         despawnEdguard();
                                         p.sendMessage("Edguard has been despawned!");
                                     } else {
@@ -145,7 +150,7 @@ public class craftalotCommand implements CommandExecutor {
                                     }
                                     break;
                                 case "movehere":
-                                    if (schedule == true) {
+                                    if (schedule) {
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                                         plugin.saveConfig();
                                         edguard.teleport(p.getLocation());
@@ -196,7 +201,9 @@ public class craftalotCommand implements CommandExecutor {
                         settings.setItemMeta(settings_meta);
 
                         ItemStack[] menuItems = {craftlist, edguard, settings};
-                        gui.setContents(menuItems);
+                        gui.setItem(12, menuItems[0]);
+                        gui.setItem(13, menuItems[1]);
+                        gui.setItem(14, menuItems[2]);
 
 
                         p.openInventory(gui);
