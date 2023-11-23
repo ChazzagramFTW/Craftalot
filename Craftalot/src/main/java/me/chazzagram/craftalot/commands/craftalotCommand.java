@@ -109,17 +109,17 @@ public class craftalotCommand implements CommandExecutor {
                     case "help":
                         p.sendMessage(
                                 """
-                                        §7--- Craftalot Commands ---
-                                        §6/ca help: §fThis page! Congrats!
-                                        §7§oUsage: /craftalot help {1,2,3..}
-                                        §6/ca list: §fList the craftable items.
-                                        §7§oUsage: /craftalot list
-                                        §6/ca edguard: §fCommand to control the item collector Edguard.
-                                        §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
-                                        §6/ca reload: §fReloads the craftlist in the config.\s
-                                        §7§oUsage: /craftalot reload
-                                        §6/ca version: §fCheck what version the plugin is running on.
-                                        §7§oUsage: /craftalot version
+                                §7--- Craftalot Commands ---
+                                §6/ca help: §fThis page! Congrats!
+                                §7§oUsage: /craftalot help {1,2,3..}
+                                §6/ca list: §fList the craftable items.
+                                §7§oUsage: /craftalot list
+                                §6/ca edguard: §fCommand to control the item collector Edguard.
+                                §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
+                                §6/ca reload: §fReloads the craftlist in the config.\s
+                                §7§oUsage: /craftalot reload
+                                §6/ca version: §fCheck what version the plugin is running on.
+                                §7§oUsage: /craftalot version
                                 """
                         );
                         break;
