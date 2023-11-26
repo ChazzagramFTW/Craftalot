@@ -3,6 +3,7 @@ me\chazzagram\craftalot\commands\SpawnCommand.class
 me\chazzagram\craftalot\commands\setSpawnCommand.class
 me\chazzagram\craftalot\commands\craftalotCommand.class
 me\chazzagram\craftalot\Craftalot.class
+me\chazzagram\craftalot\expansion\SpigotExpansion.class
 me\chazzagram\craftalot\listeners\ShearSheepListener.class
 me\chazzagram\craftalot\listeners\SpawnListener.class
 me\chazzagram\craftalot\listeners\craftalotGUIListener.class

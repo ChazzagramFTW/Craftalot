@@ -2,6 +2,7 @@ package me.chazzagram.craftalot.commands;
 
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -104,7 +105,7 @@ public class craftalotCommand implements CommandExecutor {
                         p.sendMessage("§8§oThis list can be changed in the config.");
                         break;
                     case "version":
-                        p.sendMessage("§8Craftalot Plugin Version: " + plugin.getDescription().getVersion());
+                        p.sendMessage("§8Craftalot Plugin Version: " + PlaceholderAPI.setPlaceholders(p, "%craftalot_version%"));
                         break;
                     case "help":
                         p.sendMessage(

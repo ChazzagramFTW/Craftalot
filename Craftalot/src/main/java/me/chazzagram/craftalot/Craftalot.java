@@ -1,11 +1,14 @@
 package me.chazzagram.craftalot;
 
 import me.chazzagram.craftalot.commands.*;
+import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.listeners.ShearSheepListener;
 import me.chazzagram.craftalot.listeners.SpawnListener;
 import me.chazzagram.craftalot.listeners.XPBottleBreakListener;
 import me.chazzagram.craftalot.listeners.craftalotGUIListener;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -43,8 +46,10 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getCommand("spawnonjoin").setExecutor(new spawnOnJoinCommand(this));
         getCommand("craftalot").setExecutor(new craftalotCommand(this));
 
-
-
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            Bukkit.getPluginManager().registerEvents(this, this);
+            new SpigotExpansion(this).register();
+        }
         // config
         CraftlistConfig.setup();
         CraftlistConfig.get().addDefault("craftlist", "");

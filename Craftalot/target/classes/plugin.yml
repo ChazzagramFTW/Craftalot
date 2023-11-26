@@ -1,5 +1,5 @@
 name: Craftalot
-version: 'PREBUILD-23.1123'
+version: 'PREBUILD-23.1126'
 main: me.chazzagram.craftalot.Craftalot
 api-version: '1.20'
 authors: [Chazzagram]
