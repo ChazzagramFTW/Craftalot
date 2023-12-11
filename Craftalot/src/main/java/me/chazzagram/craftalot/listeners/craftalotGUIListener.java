@@ -58,6 +58,7 @@ public class craftalotGUIListener implements Listener {
                 guiSettings.setItem(11, menuItems[1]);
                 guiSettings.setItem(12, menuItems[2]);
                 guiSettings.setItem(14, menuItems[7]);
+                guiSettings.setItem(15, menuItems[8]);
                 switch(plugin.getConfig().getString("craftalot.time-of-day")){
                     case "day":
                         guiSettings.setItem(20, menuItems[3]);
@@ -133,13 +134,25 @@ public class craftalotGUIListener implements Listener {
                         settingsUser = p;
                         p.closeInventory();
                         p.sendMessage("§aPlease enter the X coordinate:");
-                        break;
                     } else if (e.getClick().isRightClick()){
                         plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
                         p.closeInventory();
                         p.sendMessage("§aLobby Location set to §fcurrent position.");
-
                     }
+                    break;
+                case 15:
+                    if (e.getClick().isLeftClick()) {
+                        currentSetting = "craftalot.game-begin-location";
+                        selectedLocation = "x";
+                        settingsUser = p;
+                        p.closeInventory();
+                        p.sendMessage("§aPlease enter the X coordinate:");
+                    } else if (e.getClick().isRightClick()){
+                        plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
+                        p.closeInventory();
+                        p.sendMessage("§aGame Start Location set to §fcurrent position.");
+                    }
+                    break;
             }
         }
     }
@@ -153,6 +166,7 @@ public class craftalotGUIListener implements Listener {
         ItemStack valid = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
         ItemStack invalid = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         ItemStack lobbyloc = new ItemStack(Material.COMPASS);
+        ItemStack gamebeginloc = new ItemStack(Material.COMPASS);
 
         ItemMeta time_limit_meta = time_limit.getItemMeta();
         time_limit_meta.setDisplayName("§eTime Limit");
@@ -211,7 +225,15 @@ public class craftalotGUIListener implements Listener {
         lobbyloc_meta.setLore(lobbyloc_lore);
         lobbyloc.setItemMeta(lobbyloc_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc};
+        ItemMeta gamebeginloc_meta = gamebeginloc.getItemMeta();
+        gamebeginloc_meta.setDisplayName("§7Game Start Location");
+        ArrayList<String> gamebeginloc_lore = new ArrayList<>();
+        gamebeginloc_lore.add("§fLeft Click to manually set position.");
+        gamebeginloc_lore.add("§fRight Click to set to current position.");
+        gamebeginloc_meta.setLore(gamebeginloc_lore);
+        gamebeginloc.setItemMeta(gamebeginloc_meta);
+
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc};
     }
 
     @EventHandler
@@ -265,11 +287,48 @@ public class craftalotGUIListener implements Listener {
                         break;
                     case "pitch":
                         plugin.getConfig().set("craftalot.lobby-location.pitch", message);
-                        p.sendMessage("§aPlease enter the yaw direction:");
+                        p.sendMessage("§aPlease enter the yaw direction.");
                         selectedLocation = "yaw";
                         break;
                     case "yaw":
                         plugin.getConfig().set("craftalot.lobby-location.yaw", message);
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            plugin.saveConfig();
+                            p.openInventory(guiSettings);
+                        });
+                        selectedLocation = "x";
+                        settingsUser = null;
+                        break;
+                }
+            } else if(currentSetting.equals("craftalot.game-begin-location")){
+                switch(selectedLocation){
+                    case "x":
+                        plugin.getConfig().set("craftalot.game-begin-location.x", message);
+                        p.sendMessage("§aPlease enter the Y coordinate:");
+                        selectedLocation = "y";
+                        break;
+                    case "y":
+                        plugin.getConfig().set("craftalot.game-begin-location.y", message);
+                        p.sendMessage("§aPlease enter the Z coordinate:");
+                        selectedLocation = "z";
+                        break;
+                    case "z":
+                        plugin.getConfig().set("craftalot.game-begin-location.z", message);
+                        p.sendMessage("§aPlease enter the world name:");
+                        selectedLocation = "world";
+                        break;
+                    case "world":
+                        plugin.getConfig().set("craftalot.game-begin-location.world", message);
+                        p.sendMessage("§aPlease enter the pitch direction:");
+                        selectedLocation = "pitch";
+                        break;
+                    case "pitch":
+                        plugin.getConfig().set("craftalot.game-begin-location.pitch", message);
+                        p.sendMessage("§aPlease enter the yaw direction.");
+                        selectedLocation = "yaw";
+                        break;
+                    case "yaw":
+                        plugin.getConfig().set("craftalot.game-begin-location.yaw", message);
                         Bukkit.getScheduler().runTask(plugin, () -> {
                             plugin.saveConfig();
                             p.openInventory(guiSettings);
