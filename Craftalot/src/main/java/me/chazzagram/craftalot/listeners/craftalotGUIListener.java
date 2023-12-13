@@ -49,6 +49,8 @@ public class craftalotGUIListener implements Listener {
                     }
 
                 }
+                ItemStack[] menuItems = getMenuItems();
+                guiCraftlist.setItem(35, menuItems[10]);
                 p.openInventory(guiCraftlist);
 
 
@@ -63,6 +65,7 @@ public class craftalotGUIListener implements Listener {
                 guiSettings.setItem(14, menuItems[7]);
                 guiSettings.setItem(15, menuItems[8]);
                 guiSettings.setItem(16, menuItems[9]);
+                guiSettings.setItem(31, menuItems[10]);
                 switch (plugin.getConfig().getString("craftalot.time-of-day")) {
                     case "day":
                         guiSettings.setItem(20, menuItems[3]);
@@ -89,8 +92,14 @@ public class craftalotGUIListener implements Listener {
             }
 
         } else if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
-            CraftlistConfig.get().set("craftlist.item" + e.getSlot(), guiCraftlist.getItem(e.getSlot()));
-            CraftlistConfig.save();
+            if(e.getSlot() == 35) {
+                p.closeInventory();
+                p.openInventory(craftalotCommand.gui);
+                e.setCancelled(true);
+            } else {
+                CraftlistConfig.get().set("craftlist.item" + e.getSlot(), guiCraftlist.getItem(e.getSlot()));
+                CraftlistConfig.save();
+            }
         } else if (e.getView().getTitle().equalsIgnoreCase("§9Settings GUI")) {
             e.setCancelled(true);
             ItemStack[] menuItems = getMenuItems();
@@ -175,6 +184,10 @@ public class craftalotGUIListener implements Listener {
                         }
                     }
                     break;
+                case 31:
+                    p.closeInventory();
+                    p.openInventory(craftalotCommand.gui);
+                    break;
             }
         }
     }
@@ -190,6 +203,7 @@ public class craftalotGUIListener implements Listener {
         ItemStack lobbyloc = new ItemStack(Material.COMPASS);
         ItemStack gamebeginloc = new ItemStack(Material.COMPASS);
         ItemStack edguardloc = new ItemStack(Material.COMPASS);
+        ItemStack goback = new ItemStack(Material.ARROW);
 
         ItemMeta time_limit_meta = time_limit.getItemMeta();
         time_limit_meta.setDisplayName("§eTime Limit");
@@ -264,7 +278,14 @@ public class craftalotGUIListener implements Listener {
         edguardloc_meta.setLore(edguardloc_lore);
         edguardloc.setItemMeta(edguardloc_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc};
+        ItemMeta goback_meta = goback.getItemMeta();
+        goback_meta.setDisplayName("§e§oGo Back");
+        ArrayList<String> goback_lore = new ArrayList<>();
+        edguardloc_lore.add("§fReturn to previous interface.");
+        edguardloc_meta.setLore(goback_lore);
+        goback.setItemMeta(goback_meta);
+
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback};
     }
 
     @EventHandler

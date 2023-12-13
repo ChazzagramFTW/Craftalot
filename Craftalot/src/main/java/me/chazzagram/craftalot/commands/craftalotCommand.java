@@ -48,6 +48,7 @@ Issues:
 public class craftalotCommand implements CommandExecutor {
 
     static public Entity edguard;
+    public static Inventory gui = Bukkit.createInventory(null, 27, "§6Craftalot GUI");
     static int count = 0;
     static public boolean schedule = false;
 
@@ -59,7 +60,7 @@ public class craftalotCommand implements CommandExecutor {
 
     public static void spawnEdguard(){
 
-        if(plugin.getConfig().getString("craftalot.edguard-location.world") != null) {
+        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
             edguard = Bukkit.getWorld(plugin.getConfig().getString("craftalot.edguard-location.world")).spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
 
             edguard.setGravity(false);
@@ -68,22 +69,23 @@ public class craftalotCommand implements CommandExecutor {
             edguard.setInvulnerable(true);
 
             schedule = true;
-            count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    if (!schedule) {
-                        Bukkit.getScheduler().cancelTask(count);
-                    } else {
-                        edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
-                    }
+            count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+                if (!schedule) {
+                    Bukkit.getScheduler().cancelTask(count);
+                } else {
+                    edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
                 }
             }, 20L, 0);
         }
     }
 
     public static void despawnEdguard(){
-        schedule = false;
-        edguard.remove();
+        if(edguard != null) {
+            schedule = false;
+            edguard.remove();
+        } else {
+            System.out.println("[Craftalot] Edguard does not exist, despawn is not required.");
+        }
     }
 
     @Override
@@ -171,7 +173,6 @@ public class craftalotCommand implements CommandExecutor {
                         break;
 
                     case "gui":
-                        Inventory gui = Bukkit.createInventory(p, 27, "§6Craftalot GUI");
 
                         ItemStack craftlist = new ItemStack(Material.PAPER);
                         ItemStack edguard = new ItemStack(Material.VILLAGER_SPAWN_EGG);
