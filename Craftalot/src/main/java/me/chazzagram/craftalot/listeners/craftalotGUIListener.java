@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.listeners;
 
 import me.chazzagram.craftalot.Craftalot;
+import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -15,6 +16,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 
+import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
+
 public class craftalotGUIListener implements Listener {
     Inventory guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
     Inventory guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
@@ -25,23 +28,23 @@ public class craftalotGUIListener implements Listener {
     public String currentSetting;
     private final Craftalot plugin;
 
-    public craftalotGUIListener(Craftalot plugin){
+    public craftalotGUIListener(Craftalot plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler
-    public void clickEvent(InventoryClickEvent e){
+    public void clickEvent(InventoryClickEvent e) {
 
         Player p = (Player) e.getWhoClicked();
 
-        if(e.getView().getTitle().equalsIgnoreCase("§6Craftalot GUI")){
+        if (e.getView().getTitle().equalsIgnoreCase("§6Craftalot GUI")) {
             e.setCancelled(true);
-            if (e.getCurrentItem().getType().equals(Material.PAPER)){
+            if (e.getCurrentItem().getType().equals(Material.PAPER)) {
                 p.sendMessage("§7Loading interface..");
                 p.closeInventory();
-                for (int i = 0; i <= 32; i++){
+                for (int i = 0; i <= 32; i++) {
                     itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
-                    if(itemSelected != null){
+                    if (itemSelected != null) {
                         guiCraftlist.setItem(i, itemSelected);
                     }
 
@@ -59,7 +62,8 @@ public class craftalotGUIListener implements Listener {
                 guiSettings.setItem(12, menuItems[2]);
                 guiSettings.setItem(14, menuItems[7]);
                 guiSettings.setItem(15, menuItems[8]);
-                switch(plugin.getConfig().getString("craftalot.time-of-day")){
+                guiSettings.setItem(16, menuItems[9]);
+                switch (plugin.getConfig().getString("craftalot.time-of-day")) {
                     case "day":
                         guiSettings.setItem(20, menuItems[3]);
                         break;
@@ -70,7 +74,7 @@ public class craftalotGUIListener implements Listener {
                         p.sendMessage("Invalid configuration for 'time of day', toggle the setting to fix.");
                         break;
                 }
-                switch(plugin.getConfig().getString("craftalot.player-visibility")){
+                switch (plugin.getConfig().getString("craftalot.player-visibility")) {
                     case "true":
                         guiSettings.setItem(21, menuItems[5]);
                         break;
@@ -84,7 +88,7 @@ public class craftalotGUIListener implements Listener {
                 p.openInventory(guiSettings);
             }
 
-        } else if(e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")){
+        } else if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
             CraftlistConfig.get().set("craftlist.item" + e.getSlot(), guiCraftlist.getItem(e.getSlot()));
             CraftlistConfig.save();
         } else if (e.getView().getTitle().equalsIgnoreCase("§9Settings GUI")) {
@@ -134,7 +138,7 @@ public class craftalotGUIListener implements Listener {
                         settingsUser = p;
                         p.closeInventory();
                         p.sendMessage("§aPlease enter the X coordinate:");
-                    } else if (e.getClick().isRightClick()){
+                    } else if (e.getClick().isRightClick()) {
                         plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
                         p.closeInventory();
                         p.sendMessage("§aLobby Location set to §fcurrent position.");
@@ -147,10 +151,28 @@ public class craftalotGUIListener implements Listener {
                         settingsUser = p;
                         p.closeInventory();
                         p.sendMessage("§aPlease enter the X coordinate:");
-                    } else if (e.getClick().isRightClick()){
+                    } else if (e.getClick().isRightClick()) {
                         plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
                         p.closeInventory();
                         p.sendMessage("§aGame Start Location set to §fcurrent position.");
+                    }
+                    break;
+                case 16:
+                    if (e.getClick().isLeftClick()) {
+                        currentSetting = "craftalot.edguard-location";
+                        selectedLocation = "x";
+                        settingsUser = p;
+                        p.closeInventory();
+                        p.sendMessage("§aPlease enter the X coordinate:");
+                    } else if (e.getClick().isRightClick()) {
+                        if (craftalotCommand.schedule) {
+                            plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
+                            plugin.saveConfig();
+                            edguard.teleport(p.getLocation());
+                            p.sendMessage("§aEdguard has been teleported to your §fcurrent position.");
+                        } else {
+                            p.sendMessage("§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                        }
                     }
                     break;
             }
@@ -167,6 +189,7 @@ public class craftalotGUIListener implements Listener {
         ItemStack invalid = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         ItemStack lobbyloc = new ItemStack(Material.COMPASS);
         ItemStack gamebeginloc = new ItemStack(Material.COMPASS);
+        ItemStack edguardloc = new ItemStack(Material.COMPASS);
 
         ItemMeta time_limit_meta = time_limit.getItemMeta();
         time_limit_meta.setDisplayName("§eTime Limit");
@@ -233,24 +256,21 @@ public class craftalotGUIListener implements Listener {
         gamebeginloc_meta.setLore(gamebeginloc_lore);
         gamebeginloc.setItemMeta(gamebeginloc_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc};
+        ItemMeta edguardloc_meta = edguardloc.getItemMeta();
+        edguardloc_meta.setDisplayName("§7Edguard Location");
+        ArrayList<String> edguardloc_lore = new ArrayList<>();
+        edguardloc_lore.add("§fLeft Click to manually set position.");
+        edguardloc_lore.add("§fRight Click to set to current position.");
+        edguardloc_meta.setLore(edguardloc_lore);
+        edguardloc.setItemMeta(edguardloc_meta);
+
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc};
     }
 
     @EventHandler
-    public void invEvent(InventoryInteractEvent e){
+    public void invEvent(InventoryInteractEvent e) {
 
-        if(e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")){
-            for (int i = 0; i <= 32; i++) {
-                CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
-                CraftlistConfig.save();
-            }
-        }
-    }
-
-   @EventHandler
-    public void invEvent(InventoryCloseEvent e){
-
-        if(e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")){
+        if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
             for (int i = 0; i <= 32; i++) {
                 CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
                 CraftlistConfig.save();
@@ -259,87 +279,60 @@ public class craftalotGUIListener implements Listener {
     }
 
     @EventHandler
-    public void playerChatEvent(AsyncPlayerChatEvent e){
+    public void invEvent(InventoryCloseEvent e) {
+
+        if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
+            for (int i = 0; i <= 32; i++) {
+                CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
+                CraftlistConfig.save();
+            }
+        }
+    }
+
+    @EventHandler
+    public void playerChatEvent(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         String message = e.getMessage();
-        if(p == settingsUser){
-            if(currentSetting.equals("craftalot.lobby-location")){
-                switch(selectedLocation){
-                    case "x":
-                        plugin.getConfig().set("craftalot.lobby-location.x", message);
-                        p.sendMessage("§aPlease enter the Y coordinate:");
-                        selectedLocation = "y";
-                        break;
-                    case "y":
-                        plugin.getConfig().set("craftalot.lobby-location.y", message);
-                        p.sendMessage("§aPlease enter the Z coordinate:");
-                        selectedLocation = "z";
-                        break;
-                    case "z":
-                        plugin.getConfig().set("craftalot.lobby-location.z", message);
-                        p.sendMessage("§aPlease enter the world name:");
-                        selectedLocation = "world";
-                        break;
-                    case "world":
-                        plugin.getConfig().set("craftalot.lobby-location.world", message);
-                        p.sendMessage("§aPlease enter the pitch direction:");
-                        selectedLocation = "pitch";
-                        break;
-                    case "pitch":
-                        plugin.getConfig().set("craftalot.lobby-location.pitch", message);
-                        p.sendMessage("§aPlease enter the yaw direction.");
-                        selectedLocation = "yaw";
-                        break;
-                    case "yaw":
-                        plugin.getConfig().set("craftalot.lobby-location.yaw", message);
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            plugin.saveConfig();
-                            p.openInventory(guiSettings);
-                        });
-                        selectedLocation = "x";
-                        settingsUser = null;
-                        break;
-                }
-            } else if(currentSetting.equals("craftalot.game-begin-location")){
-                switch(selectedLocation){
-                    case "x":
-                        plugin.getConfig().set("craftalot.game-begin-location.x", message);
-                        p.sendMessage("§aPlease enter the Y coordinate:");
-                        selectedLocation = "y";
-                        break;
-                    case "y":
-                        plugin.getConfig().set("craftalot.game-begin-location.y", message);
-                        p.sendMessage("§aPlease enter the Z coordinate:");
-                        selectedLocation = "z";
-                        break;
-                    case "z":
-                        plugin.getConfig().set("craftalot.game-begin-location.z", message);
-                        p.sendMessage("§aPlease enter the world name:");
-                        selectedLocation = "world";
-                        break;
-                    case "world":
-                        plugin.getConfig().set("craftalot.game-begin-location.world", message);
-                        p.sendMessage("§aPlease enter the pitch direction:");
-                        selectedLocation = "pitch";
-                        break;
-                    case "pitch":
-                        plugin.getConfig().set("craftalot.game-begin-location.pitch", message);
-                        p.sendMessage("§aPlease enter the yaw direction.");
-                        selectedLocation = "yaw";
-                        break;
-                    case "yaw":
-                        plugin.getConfig().set("craftalot.game-begin-location.yaw", message);
-                        Bukkit.getScheduler().runTask(plugin, () -> {
-                            plugin.saveConfig();
-                            p.openInventory(guiSettings);
-                        });
-                        selectedLocation = "x";
-                        settingsUser = null;
-                        break;
-                }
+        if (p == settingsUser) {
+            switch (selectedLocation) {
+                case "x":
+                    plugin.getConfig().set(currentSetting + ".x", message);
+                    p.sendMessage("§a✔\n§ePlease enter the Y coordinate:");
+                    selectedLocation = "y";
+                    break;
+                case "y":
+                    plugin.getConfig().set(currentSetting + ".y", message);
+                    p.sendMessage("§a✔\n§ePlease enter the Z coordinate:");
+                    selectedLocation = "z";
+                    break;
+                case "z":
+                    plugin.getConfig().set(currentSetting + ".z", message);
+                    p.sendMessage("§a✔\n§ePlease enter the world name:");
+                    selectedLocation = "world";
+                    break;
+                case "world":
+                    plugin.getConfig().set(currentSetting + ".world", message);
+                    p.sendMessage("§a✔\n§ePlease enter the pitch direction:");
+                    selectedLocation = "pitch";
+                    break;
+                case "pitch":
+                    plugin.getConfig().set(currentSetting + ".pitch", message);
+                    p.sendMessage("§a✔\n§ePlease enter the yaw direction.");
+                    selectedLocation = "yaw";
+                    break;
+                case "yaw":
+                    plugin.getConfig().set(currentSetting + ".yaw", message);
+                    p.sendMessage("§a✔");
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        plugin.saveConfig();
+                        p.openInventory(guiSettings);
+                    });
+                    selectedLocation = "x";
+                    settingsUser = null;
+                    break;
             }
-            e.setCancelled(true);
         }
+        e.setCancelled(true);
     }
-
 }
+

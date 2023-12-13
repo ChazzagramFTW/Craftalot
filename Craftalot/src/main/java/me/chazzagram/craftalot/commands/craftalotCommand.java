@@ -49,7 +49,7 @@ public class craftalotCommand implements CommandExecutor {
 
     static public Entity edguard;
     static int count = 0;
-    static boolean schedule = false;
+    static public boolean schedule = false;
 
     private static Craftalot plugin;
 
