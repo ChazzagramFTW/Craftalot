@@ -94,7 +94,7 @@ public class craftalotCommand implements CommandExecutor {
         if (commandSender instanceof Player p) {
 
             if (args.length == 0) {
-                p.sendMessage("Type '/craftalot help' for the full command list.");
+                plugin.messagePlayer(p, "Type '/craftalot help' for the full command list.");
 
             } else {
                 switch (args[0].toLowerCase()) {
@@ -107,7 +107,7 @@ public class craftalotCommand implements CommandExecutor {
                         p.sendMessage("§8§oThis list can be changed in the config.");
                         break;
                     case "version":
-                        p.sendMessage("§8Craftalot Plugin Version: " + PlaceholderAPI.setPlaceholders(p, "%craftalot_version%"));
+                        plugin.messagePlayer(p, "§8Craftalot Plugin Version: " + PlaceholderAPI.setPlaceholders(p, "%craftalot_version%"));
                         break;
                     case "help":
                         p.sendMessage(
@@ -138,18 +138,18 @@ public class craftalotCommand implements CommandExecutor {
 
                                         spawnEdguard();
 
-                                        p.sendMessage("Edguard has been spawned at your location!");
+                                        plugin.messagePlayer(p, "Edguard has been spawned at your location!");
                                     } else {
-                                        p.sendMessage("Edguard already exists in the world! Use '/ca edguard movehere' to teleport him to your location.");
+                                        plugin.messagePlayer(p, "Edguard already exists in the world! Use '/ca edguard movehere' to teleport him to your location.");
                                     }
 
                                     break;
                                 case "despawn":
                                     if (schedule) {
                                         despawnEdguard();
-                                        p.sendMessage("Edguard has been despawned!");
+                                        plugin.messagePlayer(p, "Edguard has been despawned!");
                                     } else {
-                                        p.sendMessage("Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                                        plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
                                     }
                                     break;
                                 case "movehere":
@@ -157,17 +157,17 @@ public class craftalotCommand implements CommandExecutor {
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                                         plugin.saveConfig();
                                         edguard.teleport(p.getLocation());
-                                        p.sendMessage("Edguard has been teleported to your location!");
+                                        plugin.messagePlayer(p, "Edguard has been teleported to your location!");
                                     } else {
-                                        p.sendMessage("Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                                        plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
                                     }
                                     break;
                                 default:
-                                    p.sendMessage("§6Incorrect Arguement!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
+                                    plugin.messagePlayer(p, "§6Incorrect Arguement!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
                                     break;
                             }
                         } else {
-                            p.sendMessage("§6Missing Arguements!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
                             break;
                         }
                         break;
@@ -213,14 +213,14 @@ public class craftalotCommand implements CommandExecutor {
 
                     case "reload":
                         CraftlistConfig.reload();
-                        p.sendMessage("Craftlist.yml reloaded.");
+                        plugin.messagePlayer(p, "Craftlist.yml reloaded.");
                         break;
 
 
 
 
                     default:
-                        p.sendMessage("Invalid argument, type '/craftalot help' for the full command list.");
+                        plugin.messagePlayer(p, "Invalid argument, type '/craftalot help' for the full command list.");
                         break;
                 }
 

@@ -74,7 +74,7 @@ public class craftalotGUIListener implements Listener {
                         guiSettings.setItem(20, menuItems[4]);
                         break;
                     default:
-                        p.sendMessage("Invalid configuration for 'time of day', toggle the setting to fix.");
+                        plugin.messagePlayer(p, "Invalid configuration for 'time of day', toggle the setting to fix.");
                         break;
                 }
                 switch (plugin.getConfig().getString("craftalot.player-visibility")) {
@@ -85,7 +85,7 @@ public class craftalotGUIListener implements Listener {
                         guiSettings.setItem(21, menuItems[6]);
                         break;
                     default:
-                        p.sendMessage("Invalid configuration for 'player visibility', toggle the setting to fix.");
+                        plugin.messagePlayer(p, "Invalid configuration for 'player visibility', toggle the setting to fix.");
                         break;
                 }
                 p.openInventory(guiSettings);
@@ -117,7 +117,7 @@ public class craftalotGUIListener implements Listener {
                         plugin.saveConfig();
                         guiSettings.setItem(20, menuItems[3]);
                     } else {
-                        p.sendMessage("Configuration was invalid, corrected to default value.");
+                        plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
                         plugin.getConfig().set("craftalot.time-of-day", "day");
                         plugin.saveConfig();
                         guiSettings.setItem(20, menuItems[3]);
@@ -134,7 +134,7 @@ public class craftalotGUIListener implements Listener {
                         plugin.saveConfig();
                         guiSettings.setItem(21, menuItems[5]);
                     } else {
-                        p.sendMessage("Configuration was invalid, corrected to default value.");
+                        plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
                         plugin.getConfig().set("craftalot.player-visibility", true);
                         plugin.saveConfig();
                         guiSettings.setItem(21, menuItems[5]);
@@ -146,11 +146,11 @@ public class craftalotGUIListener implements Listener {
                         selectedLocation = "x";
                         settingsUser = p;
                         p.closeInventory();
-                        p.sendMessage("§aPlease enter the X coordinate:");
+                        plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
                     } else if (e.getClick().isRightClick()) {
                         plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
                         p.closeInventory();
-                        p.sendMessage("§aLobby Location set to §fcurrent position.");
+                        plugin.messagePlayer(p, "§aLobby Location set to §fcurrent position.");
                     }
                     break;
                 case 15:
@@ -159,11 +159,11 @@ public class craftalotGUIListener implements Listener {
                         selectedLocation = "x";
                         settingsUser = p;
                         p.closeInventory();
-                        p.sendMessage("§aPlease enter the X coordinate:");
+                        plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
                     } else if (e.getClick().isRightClick()) {
                         plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
                         p.closeInventory();
-                        p.sendMessage("§aGame Start Location set to §fcurrent position.");
+                        plugin.messagePlayer(p, "§aGame Start Location set to §fcurrent position.");
                     }
                     break;
                 case 16:
@@ -172,15 +172,15 @@ public class craftalotGUIListener implements Listener {
                         selectedLocation = "x";
                         settingsUser = p;
                         p.closeInventory();
-                        p.sendMessage("§aPlease enter the X coordinate:");
+                        plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
                     } else if (e.getClick().isRightClick()) {
                         if (craftalotCommand.schedule) {
                             plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                             plugin.saveConfig();
                             edguard.teleport(p.getLocation());
-                            p.sendMessage("§aEdguard has been teleported to your §fcurrent position.");
+                            plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
                         } else {
-                            p.sendMessage("§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                            plugin.messagePlayer(p, "§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
                         }
                     }
                     break;
@@ -318,32 +318,37 @@ public class craftalotGUIListener implements Listener {
             switch (selectedLocation) {
                 case "x":
                     plugin.getConfig().set(currentSetting + ".x", message);
-                    p.sendMessage("§a✔\n§ePlease enter the Y coordinate:");
+                    plugin.messagePlayer(p, "§a✔");
+                    plugin.messagePlayer(p, "§ePlease enter the Y coordinate:");
                     selectedLocation = "y";
                     break;
                 case "y":
                     plugin.getConfig().set(currentSetting + ".y", message);
-                    p.sendMessage("§a✔\n§ePlease enter the Z coordinate:");
+                    plugin.messagePlayer(p, "§a✔");
+                    plugin.messagePlayer(p, "§ePlease enter the Z coordinate:");
                     selectedLocation = "z";
                     break;
                 case "z":
                     plugin.getConfig().set(currentSetting + ".z", message);
-                    p.sendMessage("§a✔\n§ePlease enter the world name:");
+                    plugin.messagePlayer(p, "§a✔");
+                    plugin.messagePlayer(p, "§ePlease enter the world name:");
                     selectedLocation = "world";
                     break;
                 case "world":
                     plugin.getConfig().set(currentSetting + ".world", message);
-                    p.sendMessage("§a✔\n§ePlease enter the pitch direction:");
+                    plugin.messagePlayer(p, "§a✔");
+                    plugin.messagePlayer(p, "§ePlease enter the pitch direction.");
                     selectedLocation = "pitch";
                     break;
                 case "pitch":
                     plugin.getConfig().set(currentSetting + ".pitch", message);
-                    p.sendMessage("§a✔\n§ePlease enter the yaw direction.");
+                    plugin.messagePlayer(p, "§a✔");
+                    plugin.messagePlayer(p, "§ePlease enter the yaw direction.");
                     selectedLocation = "yaw";
                     break;
                 case "yaw":
                     plugin.getConfig().set(currentSetting + ".yaw", message);
-                    p.sendMessage("§a✔");
+                    plugin.messagePlayer(p, "§a✔");
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         plugin.saveConfig();
                         p.openInventory(guiSettings);

@@ -31,7 +31,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         plugin = this;
 
-        System.out.println("My first plugin has started, hello.");
+        messageConsole("My first plugin has started, hello.");
 
         getServer().getPluginManager().registerEvents(new XPBottleBreakListener(), this);
         getServer().getPluginManager().registerEvents(new ShearSheepListener(), this);
@@ -66,7 +66,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        System.out.println("My first plugin has stopped, bye.");
+        messageConsole("My first plugin has stopped, bye.");
 
         craftalotCommand.despawnEdguard();
 
@@ -74,6 +74,14 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
     public static Craftalot getPlugin() {
         return plugin;
+    }
+
+    public void messagePlayer(Player p, String message){
+        p.sendMessage(plugin.getConfig().getString("craftalot.prefix") + message);
+    }
+
+    public void messageConsole(String message){
+        System.out.println("[Craftalot] " + message);
     }
 
     @Override
