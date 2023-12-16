@@ -115,8 +115,8 @@ public class craftalotCommand implements CommandExecutor {
                                 §7--- Craftalot Commands ---
                                 §6/ca help: §fThis page! Congrats!
                                 §7§oUsage: /craftalot help {1,2,3..}
-                                §6/ca list: §fList the craftable items.
-                                §7§oUsage: /craftalot list
+                                §6/ca wand: §fWand tool for region setup.
+                                §7§oUsage: /craftalot wand
                                 §6/ca edguard: §fCommand to control the item collector Edguard.
                                 §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
                                 §6/ca reload: §fReloads the craftlist in the config.\s
@@ -175,7 +175,7 @@ public class craftalotCommand implements CommandExecutor {
                     case "gui":
 
                         ItemStack craftlist = new ItemStack(Material.PAPER);
-                        ItemStack edguard = new ItemStack(Material.VILLAGER_SPAWN_EGG);
+                        ItemStack game = new ItemStack(Material.VILLAGER_SPAWN_EGG);
                         ItemStack settings = new ItemStack(Material.CRAFTING_TABLE);
 
                         ItemMeta craftlist_meta = craftlist.getItemMeta();
@@ -188,12 +188,12 @@ public class craftalotCommand implements CommandExecutor {
                         CraftlistConfig.get().set("craftlist.item1", craftlist);
                         CraftlistConfig.save();
 
-                        ItemMeta edguard_meta = edguard.getItemMeta();
-                        edguard_meta.setDisplayName("§eEdguard");
-                        ArrayList<String> edguard_lore = new ArrayList<>();
-                        edguard_lore.add("§fManage edguard.");
-                        edguard_meta.setLore(edguard_lore);
-                        edguard.setItemMeta(edguard_meta);
+                        ItemMeta game_meta = game.getItemMeta();
+                        game_meta.setDisplayName("§eGame Control");
+                        ArrayList<String> game_lore = new ArrayList<>();
+                        game_lore.add("§fManage gameplay.");
+                        game_meta.setLore(game_lore);
+                        game.setItemMeta(game_meta);
 
                         ItemMeta settings_meta = settings.getItemMeta();
                         settings_meta.setDisplayName("§eSettings");
@@ -202,7 +202,7 @@ public class craftalotCommand implements CommandExecutor {
                         settings_meta.setLore(settings_lore);
                         settings.setItemMeta(settings_meta);
 
-                        ItemStack[] menuItems = {craftlist, edguard, settings};
+                        ItemStack[] menuItems = {craftlist, game, settings};
                         gui.setItem(12, menuItems[0]);
                         gui.setItem(13, menuItems[1]);
                         gui.setItem(14, menuItems[2]);
@@ -217,7 +217,19 @@ public class craftalotCommand implements CommandExecutor {
                         break;
 
 
+                    case "wand":
+                        ItemStack wand = new ItemStack(Material.STICK);
 
+                        ItemMeta wand_meta = wand.getItemMeta();
+                        wand_meta.setDisplayName("§e§lCraftalot Wand");
+                        ArrayList<String> wand_lore = new ArrayList<>();
+                        wand_lore.add("§fUsed for region setup.");
+                        wand_meta.setLore(wand_lore);
+                        wand.setItemMeta(wand_meta);
+
+                        Inventory playerInv = p.getInventory();
+                        playerInv.addItem(wand);
+                        break;
 
                     default:
                         plugin.messagePlayer(p, "Invalid argument, type '/craftalot help' for the full command list.");

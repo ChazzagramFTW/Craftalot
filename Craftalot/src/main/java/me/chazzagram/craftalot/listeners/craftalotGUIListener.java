@@ -5,6 +5,7 @@ import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
 public class craftalotGUIListener implements Listener {
     Inventory guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
     Inventory guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
+    Inventory guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
 
     ItemStack itemSelected;
     public Player settingsUser;
@@ -89,6 +91,16 @@ public class craftalotGUIListener implements Listener {
                         break;
                 }
                 p.openInventory(guiSettings);
+            } else if (e.getCurrentItem().getType().equals(Material.VILLAGER_SPAWN_EGG)){
+                p.sendMessage("§7Loading interface..");
+                p.closeInventory();
+
+                ItemStack[] menuItems = getMenuItems();
+                guiGameControl.setItem(27, menuItems[12]);
+                guiGameControl.setItem(35, menuItems[10]);
+
+                p.openInventory(guiGameControl);
+
             }
 
         } else if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
@@ -189,6 +201,21 @@ public class craftalotGUIListener implements Listener {
                     p.openInventory(craftalotCommand.gui);
                     break;
             }
+        } else if (e.getView().getTitle().equalsIgnoreCase("§9Game Control GUI")) {
+            e.setCancelled(true);
+            switch (e.getSlot()) {
+                case 27:
+                    ItemStack[] menuItems = getMenuItems();
+                    if(e.getCurrentItem().equals(menuItems[12])){
+                        guiGameControl.setItem(27, menuItems[11]);
+                    }
+                    break;
+                case 35:
+                    p.closeInventory();
+                    p.openInventory(craftalotCommand.gui);
+                    e.setCancelled(true);
+                    break;
+            }
         }
     }
 
@@ -205,6 +232,10 @@ public class craftalotGUIListener implements Listener {
         ItemStack edguardloc = new ItemStack(Material.COMPASS);
         ItemStack goback = new ItemStack(Material.ARROW);
 
+        ItemStack gameRunning = new ItemStack(Material.FILLED_MAP);
+        ItemStack gameWaiting = new ItemStack(Material.MAP);
+
+        // Settings
         ItemMeta time_limit_meta = time_limit.getItemMeta();
         time_limit_meta.setDisplayName("§eTime Limit");
         ArrayList<String> time_limit_lore = new ArrayList<>();
@@ -281,11 +312,26 @@ public class craftalotGUIListener implements Listener {
         ItemMeta goback_meta = goback.getItemMeta();
         goback_meta.setDisplayName("§e§oGo Back");
         ArrayList<String> goback_lore = new ArrayList<>();
-        edguardloc_lore.add("§fReturn to previous interface.");
-        edguardloc_meta.setLore(goback_lore);
+        goback_lore.add("§fReturn to previous interface.");
+        goback_meta.setLore(goback_lore);
         goback.setItemMeta(goback_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback};
+        // Game Control
+        ItemMeta gameRunning_meta = gameRunning.getItemMeta();
+        gameRunning_meta.setDisplayName("§7§oGame Running.");
+        ArrayList<String> gameRunning_lore = new ArrayList<>();
+        gameRunning_lore.add("§fUse pause/stop to change this.");
+        gameRunning_meta.setLore(gameRunning_lore);
+        gameRunning.setItemMeta(gameRunning_meta);
+
+        ItemMeta gameWaiting_meta = gameWaiting.getItemMeta();
+        gameWaiting_meta.setDisplayName("§e§oStart Game");
+        ArrayList<String> gameWaiting_lore = new ArrayList<>();
+        gameWaiting_lore.add("§fPlayer's will be teleported to lobby.");
+        gameWaiting_meta.setLore(gameWaiting_lore);
+        gameWaiting.setItemMeta(gameWaiting_meta);
+
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting};
     }
 
     @EventHandler
