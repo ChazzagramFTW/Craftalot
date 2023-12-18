@@ -3,7 +3,9 @@ package me.chazzagram.craftalot.listeners;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.playerInfo.playerInfo;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -208,6 +210,21 @@ public class craftalotGUIListener implements Listener {
                     ItemStack[] menuItems = getMenuItems();
                     if(e.getCurrentItem().equals(menuItems[12])){
                         guiGameControl.setItem(27, menuItems[11]);
+
+                        ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                        boolean blacklisted = false;
+                        for (Player player : onlinePlayers) {
+                            for (String name : plugin.getConfig().getStringList("craftalot.blacklisted-players")) {
+                                if (player.getName().equals(name)) {
+                                    blacklisted = true;
+                                }
+                            }
+                            if (!blacklisted) {
+                                plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0));
+                                plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points.");
+                            }
+                            blacklisted = false;
+                        }
                     }
                     break;
                 case 35:

@@ -58,3 +58,6 @@ craftalot:
     # Points per item crafted.
     # Default: 1
     per-craft: 1
+
+  blacklisted-players:
+    - mightybrothers1

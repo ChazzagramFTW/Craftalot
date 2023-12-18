@@ -7,6 +7,7 @@ import me.chazzagram.craftalot.listeners.ShearSheepListener;
 import me.chazzagram.craftalot.listeners.SpawnListener;
 import me.chazzagram.craftalot.listeners.XPBottleBreakListener;
 import me.chazzagram.craftalot.listeners.craftalotGUIListener;
+import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,14 +21,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 public final class Craftalot extends JavaPlugin implements Listener {
 
 
     private static Craftalot plugin;
 
+    public HashMap<UUID, playerInfo> pointSystem;
+
+
     @Override
     public void onEnable() {
         // Plugin startup logic
+
+        this.pointSystem = new HashMap<>();
 
         plugin = this;
 
