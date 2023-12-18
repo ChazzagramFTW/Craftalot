@@ -10,4 +10,5 @@ me\chazzagram\craftalot\listeners\craftalotGUIListener.class
 me\chazzagram\craftalot\listeners\XPBottleBreakListener.class
 me\chazzagram\craftalot\commands\GodCommand.class
 me\chazzagram\craftalot\commands\spawnOnJoinCommand.class
+me\chazzagram\craftalot\listeners\edguardListener.class
 me\chazzagram\craftalot\commands\RepeatCommand.class

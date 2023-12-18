@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
 
@@ -26,6 +27,7 @@ public class craftalotGUIListener implements Listener {
     Inventory guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
     Inventory guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
 
+    static boolean gameRunning = false;
     ItemStack itemSelected;
     public Player settingsUser;
     public String selectedLocation;
@@ -43,7 +45,7 @@ public class craftalotGUIListener implements Listener {
 
         if (e.getView().getTitle().equalsIgnoreCase("§6Craftalot GUI")) {
             e.setCancelled(true);
-            if (e.getCurrentItem().getType().equals(Material.PAPER)) {
+            if (Objects.requireNonNull(e.getCurrentItem()).getType().equals(Material.PAPER)) {
                 p.sendMessage("§7Loading interface..");
                 p.closeInventory();
                 for (int i = 0; i <= 32; i++) {
@@ -226,6 +228,7 @@ public class craftalotGUIListener implements Listener {
                             blacklisted = false;
                         }
                     }
+                    gameRunning = true;
                     break;
                 case 35:
                     p.closeInventory();

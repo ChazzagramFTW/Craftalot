@@ -3,10 +3,7 @@ package me.chazzagram.craftalot;
 import me.chazzagram.craftalot.commands.*;
 import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.CraftlistConfig;
-import me.chazzagram.craftalot.listeners.ShearSheepListener;
-import me.chazzagram.craftalot.listeners.SpawnListener;
-import me.chazzagram.craftalot.listeners.XPBottleBreakListener;
-import me.chazzagram.craftalot.listeners.craftalotGUIListener;
+import me.chazzagram.craftalot.listeners.*;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -47,6 +44,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
         getServer().getPluginManager().registerEvents(new craftalotGUIListener(this), this);
+        getServer().getPluginManager().registerEvents(new edguardListener(this), this);
 
         getCommand("god").setExecutor(new GodCommand());
         getCommand("repeat").setExecutor(new RepeatCommand());
