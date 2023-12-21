@@ -28,9 +28,6 @@ public class craftalotGUIListener implements Listener {
     private Inventory guiGameControl;
     private boolean gameRunning = false;
 
-    public boolean isGameRunning() {
-        return gameRunning;
-    }
     private ItemStack itemSelected;
     private Player settingsUser;
     private String selectedLocation;
@@ -45,6 +42,12 @@ public class craftalotGUIListener implements Listener {
         this.gameRunning = false;
         this.selectedLocation = "x";
         this.currentSetting = "";
+
+
+    }
+
+    public boolean isGameRunning() {
+        return gameRunning;
     }
 
     @EventHandler
@@ -122,7 +125,8 @@ public class craftalotGUIListener implements Listener {
                 p.openInventory(craftalotCommand.gui);
                 e.setCancelled(true);
             } else {
-                CraftlistConfig.get().set("craftlist.item" + e.getSlot(), guiCraftlist.getItem(e.getSlot()));
+                ItemStack item = guiCraftlist.getItem(e.getSlot());
+                CraftlistConfig.get().set("craftlist.item" + e.getSlot(), item);
                 CraftlistConfig.save();
             }
         } else if (e.getView().getTitle().equalsIgnoreCase("§9Settings GUI")) {
@@ -432,8 +436,8 @@ public class craftalotGUIListener implements Listener {
                     settingsUser = null;
                     break;
             }
+            e.setCancelled(true);
         }
-        e.setCancelled(true);
     }
 }
 
