@@ -23,19 +23,28 @@ import java.util.Objects;
 import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
 
 public class craftalotGUIListener implements Listener {
-    Inventory guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
-    Inventory guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
-    Inventory guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
+    private Inventory guiCraftlist;
+    private Inventory guiSettings;
+    private Inventory guiGameControl;
+    private boolean gameRunning = false;
 
-    static boolean gameRunning = false;
-    ItemStack itemSelected;
-    public Player settingsUser;
-    public String selectedLocation;
-    public String currentSetting;
+    public boolean isGameRunning() {
+        return gameRunning;
+    }
+    private ItemStack itemSelected;
+    private Player settingsUser;
+    private String selectedLocation;
+    private String currentSetting;
     private final Craftalot plugin;
 
     public craftalotGUIListener(Craftalot plugin) {
         this.plugin = plugin;
+        this.guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
+        this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
+        this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
+        this.gameRunning = false;
+        this.selectedLocation = "x";
+        this.currentSetting = "";
     }
 
     @EventHandler
