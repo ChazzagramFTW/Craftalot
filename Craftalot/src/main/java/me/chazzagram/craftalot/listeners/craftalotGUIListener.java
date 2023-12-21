@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 
 import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
 
@@ -122,6 +123,10 @@ public class craftalotGUIListener implements Listener {
         } else if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
             if(e.getSlot() == 35) {
                 p.closeInventory();
+                for (int i = 0; i <= 32; i++) {
+                    CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
+                    CraftlistConfig.save();
+                }
                 p.openInventory(craftalotCommand.gui);
                 e.setCancelled(true);
             } else {
@@ -235,8 +240,8 @@ public class craftalotGUIListener implements Listener {
                                 }
                             }
                             if (!blacklisted) {
-                                plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0));
-                                plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points.");
+                                plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, randomItem()));
+                                plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points, and has to craft item: " + plugin.pointSystem.get(player.getUniqueId()).getItemToCraft().getType());
                             }
                             blacklisted = false;
                         }
@@ -365,6 +370,15 @@ public class craftalotGUIListener implements Listener {
         gameWaiting.setItemMeta(gameWaiting_meta);
 
         return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting};
+    }
+
+    public ItemStack randomItem(){
+        Random rand = new Random();
+        int slot;
+        do {
+            slot = rand.nextInt(32);
+        } while (CraftlistConfig.get().getItemStack("craftlist.item" + slot) == null);
+        return CraftlistConfig.get().getItemStack("craftlist.item" + slot);
     }
 
     @EventHandler
