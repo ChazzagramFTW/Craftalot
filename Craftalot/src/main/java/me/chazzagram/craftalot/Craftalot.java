@@ -26,6 +26,12 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
     private static Craftalot plugin;
 
+    private static Craftalot instance;
+
+    public static Craftalot getInstance(){
+        return instance;
+    }
+
     public HashMap<UUID, playerInfo> pointSystem;
 
 
@@ -34,6 +40,8 @@ public final class Craftalot extends JavaPlugin implements Listener {
         // Plugin startup logic
 
         this.pointSystem = new HashMap<>();
+
+        instance = this;
 
         plugin = this;
 

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
+import me.chazzagram.craftalot.playerInfo.gameRunning;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +28,6 @@ public class craftalotGUIListener implements Listener {
     private Inventory guiCraftlist;
     private Inventory guiSettings;
     private Inventory guiGameControl;
-    private boolean gameRunning = false;
 
     private ItemStack itemSelected;
     private Player settingsUser;
@@ -40,15 +40,10 @@ public class craftalotGUIListener implements Listener {
         this.guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
         this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
         this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
-        this.gameRunning = false;
         this.selectedLocation = "x";
         this.currentSetting = "";
 
 
-    }
-
-    public boolean isGameRunning() {
-        return gameRunning;
     }
 
     @EventHandler
@@ -246,7 +241,7 @@ public class craftalotGUIListener implements Listener {
                             blacklisted = false;
                         }
                     }
-                    gameRunning = true;
+                    gameRunning.setGameRunning(true);
                     break;
                 case 35:
                     p.closeInventory();
