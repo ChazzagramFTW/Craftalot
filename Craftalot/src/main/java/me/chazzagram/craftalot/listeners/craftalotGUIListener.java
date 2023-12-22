@@ -5,9 +5,7 @@ import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,66 +51,65 @@ public class craftalotGUIListener implements Listener {
 
         if (e.getView().getTitle().equalsIgnoreCase("§6Craftalot GUI")) {
             e.setCancelled(true);
-            if (Objects.requireNonNull(e.getCurrentItem()).getType().equals(Material.PAPER)) {
-                p.sendMessage("§7Loading interface..");
-                p.closeInventory();
-                for (int i = 0; i <= 32; i++) {
-                    itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
-                    if (itemSelected != null) {
-                        guiCraftlist.setItem(i, itemSelected);
+            ItemStack[] menuItems = getMenuItems();
+            switch(e.getSlot()){
+                case 12:
+                    p.sendMessage("§7Loading interface..");
+                    p.closeInventory();
+                    for (int i = 0; i <= 32; i++) {
+                        itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
+                        if (itemSelected != null) {
+                            guiCraftlist.setItem(i, itemSelected);
+                        }
+
                     }
+                    guiCraftlist.setItem(35, menuItems[10]);
+                    p.openInventory(guiCraftlist);
+                    break;
+                case 13:
+                    p.sendMessage("§7Loading interface..");
+                    p.closeInventory();
 
-                }
-                ItemStack[] menuItems = getMenuItems();
-                guiCraftlist.setItem(35, menuItems[10]);
-                p.openInventory(guiCraftlist);
+                    guiGameControl.setItem(27, menuItems[12]);
+                    guiGameControl.setItem(35, menuItems[10]);
 
+                    p.openInventory(guiGameControl);
+                    break;
+                case 14:
+                    p.sendMessage("§7Loading interface..");
+                    p.closeInventory();
 
-            } else if (e.getCurrentItem().getType().equals(Material.CRAFTING_TABLE)) {
-                p.sendMessage("§7Loading interface..");
-                p.closeInventory();
-
-                ItemStack[] menuItems = getMenuItems();
-                guiSettings.setItem(10, menuItems[0]);
-                guiSettings.setItem(11, menuItems[1]);
-                guiSettings.setItem(12, menuItems[2]);
-                guiSettings.setItem(14, menuItems[7]);
-                guiSettings.setItem(15, menuItems[8]);
-                guiSettings.setItem(16, menuItems[9]);
-                guiSettings.setItem(31, menuItems[10]);
-                switch (plugin.getConfig().getString("craftalot.time-of-day")) {
-                    case "day":
-                        guiSettings.setItem(20, menuItems[3]);
-                        break;
-                    case "night":
-                        guiSettings.setItem(20, menuItems[4]);
-                        break;
-                    default:
-                        plugin.messagePlayer(p, "Invalid configuration for 'time of day', toggle the setting to fix.");
-                        break;
-                }
-                switch (plugin.getConfig().getString("craftalot.player-visibility")) {
-                    case "true":
-                        guiSettings.setItem(21, menuItems[5]);
-                        break;
-                    case "false":
-                        guiSettings.setItem(21, menuItems[6]);
-                        break;
-                    default:
-                        plugin.messagePlayer(p, "Invalid configuration for 'player visibility', toggle the setting to fix.");
-                        break;
-                }
-                p.openInventory(guiSettings);
-            } else if (e.getCurrentItem().getType().equals(Material.VILLAGER_SPAWN_EGG)){
-                p.sendMessage("§7Loading interface..");
-                p.closeInventory();
-
-                ItemStack[] menuItems = getMenuItems();
-                guiGameControl.setItem(27, menuItems[12]);
-                guiGameControl.setItem(35, menuItems[10]);
-
-                p.openInventory(guiGameControl);
-
+                    guiSettings.setItem(10, menuItems[0]);
+                    guiSettings.setItem(11, menuItems[1]);
+                    guiSettings.setItem(12, menuItems[2]);
+                    guiSettings.setItem(14, menuItems[7]);
+                    guiSettings.setItem(15, menuItems[8]);
+                    guiSettings.setItem(16, menuItems[9]);
+                    guiSettings.setItem(31, menuItems[10]);
+                    switch (plugin.getConfig().getString("craftalot.time-of-day")) {
+                        case "day":
+                            guiSettings.setItem(20, menuItems[3]);
+                            break;
+                        case "night":
+                            guiSettings.setItem(20, menuItems[4]);
+                            break;
+                        default:
+                            plugin.messagePlayer(p, "Invalid configuration for 'time of day', toggle the setting to fix.");
+                            break;
+                    }
+                    switch (plugin.getConfig().getString("craftalot.player-visibility")) {
+                        case "true":
+                            guiSettings.setItem(21, menuItems[5]);
+                            break;
+                        case "false":
+                            guiSettings.setItem(21, menuItems[6]);
+                            break;
+                        default:
+                            plugin.messagePlayer(p, "Invalid configuration for 'player visibility', toggle the setting to fix.");
+                            break;
+                    }
+                    p.openInventory(guiSettings);
+                    break;
             }
 
         } else if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
@@ -242,6 +239,7 @@ public class craftalotGUIListener implements Listener {
                         }
                     }
                     gameRunning.setGameRunning(true);
+
                     break;
                 case 35:
                     p.closeInventory();
