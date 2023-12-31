@@ -4,6 +4,8 @@ import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,19 +17,21 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.w3c.dom.Text;
 
+import java.awt.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 
 import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
 
 public class craftalotGUIListener implements Listener {
-    private Inventory guiCraftlist;
-    private Inventory guiSettings;
-    private Inventory guiGameControl;
+    private final Inventory guiCraftlist;
+    private final Inventory guiSettings;
+    private final Inventory guiGameControl;
 
-    private ItemStack itemSelected;
     private Player settingsUser;
     private String selectedLocation;
     private String currentSetting;
@@ -57,7 +61,7 @@ public class craftalotGUIListener implements Listener {
                     p.sendMessage("§7Loading interface..");
                     p.closeInventory();
                     for (int i = 0; i <= 32; i++) {
-                        itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
+                        ItemStack itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
                         if (itemSelected != null) {
                             guiCraftlist.setItem(i, itemSelected);
                         }
@@ -239,6 +243,15 @@ public class craftalotGUIListener implements Listener {
                         }
                     }
                     gameRunning.setGameRunning(true);
+
+                    new gameRunning(true, 200, plugin) {
+
+                        @Override
+                        public void count(int current) {
+                            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                        }
+
+                    }.startTimer();
 
                     break;
                 case 35:

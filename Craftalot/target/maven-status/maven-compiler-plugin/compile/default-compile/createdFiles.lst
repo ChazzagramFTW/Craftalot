@@ -1,8 +1,12 @@
+me\chazzagram\craftalot\playerInfo\gameRunning$1.class
+me\chazzagram\craftalot\listeners\wandListener.class
 me\chazzagram\craftalot\commands\SpawnCommand.class
 me\chazzagram\craftalot\commands\setSpawnCommand.class
 me\chazzagram\craftalot\commands\craftalotCommand.class
+me\chazzagram\craftalot\listeners\craftalotGUIListener$1.class
 me\chazzagram\craftalot\playerInfo\playerInfo.class
 me\chazzagram\craftalot\Craftalot.class
+me\chazzagram\craftalot\listeners\wandListener$1.class
 me\chazzagram\craftalot\expansion\SpigotExpansion.class
 me\chazzagram\craftalot\listeners\ShearSheepListener.class
 me\chazzagram\craftalot\listeners\SpawnListener.class

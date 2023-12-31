@@ -53,6 +53,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
         getServer().getPluginManager().registerEvents(new craftalotGUIListener(this), this);
         getServer().getPluginManager().registerEvents(new edguardListener(this), this);
+        getServer().getPluginManager().registerEvents(new wandListener(this), this);
 
         getCommand("god").setExecutor(new GodCommand());
         getCommand("repeat").setExecutor(new RepeatCommand());
