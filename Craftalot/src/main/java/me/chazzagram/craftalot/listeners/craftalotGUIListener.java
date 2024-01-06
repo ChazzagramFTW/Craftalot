@@ -244,11 +244,15 @@ public class craftalotGUIListener implements Listener {
                     }
                     gameRunning.setGameRunning(true);
 
-                    new gameRunning(true, 200, plugin) {
+                    new gameRunning(true, plugin.getConfig().getInt("craftalot.time-limit-in-seconds"), plugin) {
 
                         @Override
                         public void count(int current) {
-                            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                            if(isGamePaused()){
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lPAUSED: " + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                            } else {
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                            }
                         }
 
                     }.startTimer();

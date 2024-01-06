@@ -2,6 +2,7 @@ package me.chazzagram.craftalot.commands;
 
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.playerInfo.gameRunning;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -229,6 +230,30 @@ public class craftalotCommand implements CommandExecutor {
 
                         Inventory playerInv = p.getInventory();
                         playerInv.addItem(wand);
+                        break;
+
+                    case "pause":
+                        if(gameRunning.isGameRunning()) {
+                            if (!gameRunning.isGamePaused()) {
+                                gameRunning.setGamePaused(true);
+                            } else {
+                                plugin.messagePlayer(p, "The game is already paused!");
+                            }
+                        } else {
+                            plugin.messagePlayer(p, "A game is not currently running, use /ca gui to start a game.");
+                        }
+                        break;
+
+                    case "unpause":
+                        if(gameRunning.isGameRunning()) {
+                            if (gameRunning.isGamePaused()) {
+                                gameRunning.setGamePaused(false);
+                            } else {
+                                plugin.messagePlayer(p, "The game is already playing!");
+                            }
+                        } else {
+                            plugin.messagePlayer(p, "A game is not currently running, use /ca gui to start a game.");
+                        }
                         break;
 
                     default:
