@@ -3,6 +3,7 @@ package me.chazzagram.craftalot;
 import me.chazzagram.craftalot.commands.*;
 import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.listeners.*;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.wandInfo;
@@ -75,6 +76,11 @@ public final class Craftalot extends JavaPlugin implements Listener {
         CraftlistConfig.get().addDefault("craftlist", "");
         CraftlistConfig.get().options().copyDefaults();
         CraftlistConfig.save();
+
+        MaterialsConfig.setup();
+        MaterialsConfig.get().addDefault("materials", "");
+        MaterialsConfig .get().options().copyDefaults();
+        MaterialsConfig.save();
 
         getConfig().options().copyDefaults();
         saveDefaultConfig();

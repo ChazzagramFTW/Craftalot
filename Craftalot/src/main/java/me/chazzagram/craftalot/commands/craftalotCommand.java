@@ -2,6 +2,7 @@ package me.chazzagram.craftalot.commands;
 
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.wandInfo;
@@ -53,6 +54,8 @@ public class craftalotCommand implements CommandExecutor {
     static public Entity edguard;
     public static Inventory gui = Bukkit.createInventory(null, 27, "§6Craftalot GUI");
     static int count = 0;
+
+    boolean regionExists = false;
     static public boolean schedule = false;
 
     private static Craftalot plugin;
@@ -257,6 +260,36 @@ public class craftalotCommand implements CommandExecutor {
                             }
                         } else {
                             plugin.messagePlayer(p, "A game is not currently running, use /ca gui to start a game.");
+                        }
+                        break;
+
+                    case "setmaterials":
+                        if(args.length > 1) {
+                            if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+                                plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
+                                MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
+                                MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                MaterialsConfig.save();
+                            } else {
+                                regionExists = false;
+                                for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
+                                    if (args[1].toLowerCase().equals(key)) {
+                                        plugin.messagePlayer(p, "A region with this name already exists!");
+                                        regionExists = true;
+                                        break;
+                                    }
+                                }
+                                if (!regionExists){
+                                    plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
+                                    MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
+                                    MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                    MaterialsConfig.save();
+                                }
+                                regionExists = false;
+                            }
+                        } else {
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot setmaterials {region-name}");
+
                         }
                         break;
 
