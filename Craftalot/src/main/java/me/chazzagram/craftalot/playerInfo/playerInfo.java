@@ -1,5 +1,6 @@
 package me.chazzagram.craftalot.playerInfo;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 

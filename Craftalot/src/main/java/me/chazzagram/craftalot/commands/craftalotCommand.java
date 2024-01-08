@@ -3,6 +3,8 @@ package me.chazzagram.craftalot.commands;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
+import me.chazzagram.craftalot.playerInfo.playerInfo;
+import me.chazzagram.craftalot.playerInfo.wandInfo;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -227,6 +229,8 @@ public class craftalotCommand implements CommandExecutor {
                         wand_lore.add("§fUsed for region setup.");
                         wand_meta.setLore(wand_lore);
                         wand.setItemMeta(wand_meta);
+
+                        plugin.wandSystem.put(p.getUniqueId(), new wandInfo(null, null));
 
                         Inventory playerInv = p.getInventory();
                         playerInv.addItem(wand);

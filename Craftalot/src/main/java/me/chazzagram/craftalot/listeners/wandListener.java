@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.listeners;
 
 import me.chazzagram.craftalot.Craftalot;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,6 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class wandListener implements Listener {
 
@@ -28,10 +31,12 @@ public class wandListener implements Listener {
         if (e.getHand().equals(EquipmentSlot.HAND) && p.getInventory().getItemInMainHand().equals(getWand())){
             switch(e.getAction()){
                 case LEFT_CLICK_BLOCK:
-                    plugin.messagePlayer(p, "Left clicked block with wand.");
+                    plugin.wandSystem.get(p.getUniqueId()).setCorner1(e.getClickedBlock().getLocation());
+                    plugin.messagePlayer(p, "§aSet first location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
                     break;
                 case RIGHT_CLICK_BLOCK:
-                    plugin.messagePlayer(p, "Right clicked block with wand.");
+                    plugin.wandSystem.get(p.getUniqueId()).setCorner2(e.getClickedBlock().getLocation());
+                    plugin.messagePlayer(p, "§aSet second location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
                     break;
             }
         }

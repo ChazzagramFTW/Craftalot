@@ -5,6 +5,7 @@ import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.listeners.*;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
+import me.chazzagram.craftalot.playerInfo.wandInfo;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,6 +34,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
     }
 
     public HashMap<UUID, playerInfo> pointSystem;
+    public HashMap<UUID, wandInfo> wandSystem;
 
 
     @Override
@@ -40,6 +42,8 @@ public final class Craftalot extends JavaPlugin implements Listener {
         // Plugin startup logic
 
         this.pointSystem = new HashMap<>();
+
+        this.wandSystem = new HashMap<>();
 
         instance = this;
 

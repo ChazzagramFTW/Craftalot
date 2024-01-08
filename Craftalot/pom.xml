@@ -6,7 +6,7 @@
 
     <groupId>me.Chazzagram</groupId>
     <artifactId>craftalot</artifactId>
-    <version>PREBUILD-24.0106</version>
+    <version>PREBUILD-24.0108</version>
     <packaging>jar</packaging>
 
     <name>Craftalot</name>
