@@ -64,6 +64,20 @@ public class craftalotCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
+    public boolean checkRegion(Player p){
+        if (!plugin.wandSystem.containsKey(p.getUniqueId())) {
+            plugin.messagePlayer(p, "You do not currently have a region selected! Use §e/ca wand §7to create a region.");
+            return false;
+        } else {
+            if (plugin.wandSystem.get(p.getUniqueId()).getCorner1() == null || plugin.wandSystem.get(p.getUniqueId()).getCorner2() == null) {
+                plugin.messagePlayer(p, "You do not currently have a region selected! Use §e/ca wand §7to create a region.");
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
     public static void spawnEdguard(){
 
         if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
@@ -263,33 +277,91 @@ public class craftalotCommand implements CommandExecutor {
                         }
                         break;
 
-                    case "setmaterials":
+                    case "setregion":
+                        if(checkRegion(p)) {
+                            if (args.length > 1) {
+                                if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+                                    plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
+                                    MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
+                                    MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                    MaterialsConfig.save();
+                                } else {
+                                    regionExists = false;
+                                    for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
+                                        if (args[1].toLowerCase().equals(key)) {
+                                            plugin.messagePlayer(p, "A region with this name already exists!");
+                                            regionExists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!regionExists) {
+                                        plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
+                                        MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
+                                        MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                        MaterialsConfig.save();
+                                    }
+                                    regionExists = false;
+                                }
+                            } else {
+                                plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot setregion {region-name}");
+
+                            }
+                        }
+                        break;
+
+                    case "delregion":
                         if(args.length > 1) {
                             if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
-                                plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
-                                MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
-                                MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
-                                MaterialsConfig.save();
+                                plugin.messagePlayer(p, "Currently no material regions exist.");
                             } else {
                                 regionExists = false;
                                 for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
                                     if (args[1].toLowerCase().equals(key)) {
-                                        plugin.messagePlayer(p, "A region with this name already exists!");
+                                        plugin.messagePlayer(p, "Region '§6" + args[1] + "' §7has been deleted.");
+                                        MaterialsConfig.get().set("materials." + args[1], null);
+                                        MaterialsConfig.save();
                                         regionExists = true;
                                         break;
                                     }
                                 }
                                 if (!regionExists){
-                                    plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
-                                    MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
-                                    MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                    plugin.messagePlayer(p, "A materials region named '§6" + args[1] + "§7' does not currently exist.");
                                     MaterialsConfig.save();
                                 }
                                 regionExists = false;
                             }
                         } else {
-                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot setmaterials {region-name}");
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot delregion {region-name}");
 
+                        }
+                        break;
+
+                    case "updateregion":
+                        if(checkRegion(p)) {
+                            if (args.length > 1) {
+                                if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+                                    plugin.messagePlayer(p, "No material regions currently exist! Use §e/ca setregion {region-name} §7to create one.");
+                                } else {
+                                    regionExists = false;
+                                    for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
+                                        if (args[1].toLowerCase().equals(key)) {
+                                            plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been updated with a new region.");
+                                            MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
+                                            MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                            MaterialsConfig.save();
+                                            regionExists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!regionExists) {
+                                        plugin.messagePlayer(p, "No material regions named '§6" + args[1] + "§7' currently exists. Use §e/ca setregion {region-name} §7to create one.");
+                                    }
+                                    regionExists = false;
+                                }
+                            } else {
+                                plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot updateregion {region-name}");
+
+                            }
                         }
                         break;
 
