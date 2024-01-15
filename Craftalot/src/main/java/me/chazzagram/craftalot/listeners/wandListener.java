@@ -27,17 +27,18 @@ public class wandListener implements Listener {
     @EventHandler
     public void wandClickEvent(PlayerInteractEvent e){
         Player p = (Player) e.getPlayer();
-
-        if (e.getHand().equals(EquipmentSlot.HAND) && p.getInventory().getItemInMainHand().equals(getWand())){
-            switch(e.getAction()){
-                case LEFT_CLICK_BLOCK:
-                    plugin.wandSystem.get(p.getUniqueId()).setCorner1(e.getClickedBlock().getLocation());
-                    plugin.messagePlayer(p, "§aSet first location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
-                    break;
-                case RIGHT_CLICK_BLOCK:
-                    plugin.wandSystem.get(p.getUniqueId()).setCorner2(e.getClickedBlock().getLocation());
-                    plugin.messagePlayer(p, "§aSet second location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
-                    break;
+        if (plugin.wandSystem.containsKey(p.getUniqueId())) {
+            if (e.getHand().equals(EquipmentSlot.HAND) && p.getInventory().getItemInMainHand().equals(getWand())) {
+                switch (e.getAction()) {
+                    case LEFT_CLICK_BLOCK:
+                        plugin.wandSystem.get(p.getUniqueId()).setCorner1(e.getClickedBlock().getLocation());
+                        plugin.messagePlayer(p, "§aSet first location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
+                        break;
+                    case RIGHT_CLICK_BLOCK:
+                        plugin.wandSystem.get(p.getUniqueId()).setCorner2(e.getClickedBlock().getLocation());
+                        plugin.messagePlayer(p, "§aSet second location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
+                        break;
+                }
             }
         }
     }

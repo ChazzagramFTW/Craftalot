@@ -8,10 +8,13 @@ import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.wandInfo;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -361,6 +364,48 @@ public class craftalotCommand implements CommandExecutor {
                             } else {
                                 plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot updateregion {region-name}");
 
+                            }
+                        }
+                        break;
+
+                    case "listregions":
+                        if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+                            plugin.messagePlayer(p, "Currently no material regions exist to be restocked.");
+                        } else {
+                            plugin.messagePlayer(p, "Regions list:");
+                            ConfigurationSection section = MaterialsConfig.get().getConfigurationSection("materials.");
+                            for (String key : section.getKeys(false)) {
+                                p.sendMessage("- §6" + key);
+                            }
+                        }
+                        break;
+
+                    case "restock":
+                        if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+                            plugin.messagePlayer(p, "Currently no material regions exist to be restocked.");
+                        } else {
+                            ConfigurationSection section = MaterialsConfig.get().getConfigurationSection("materials.");
+                            for (String key : section.getKeys(false)) {
+                                World world = MaterialsConfig.get().getLocation("materials." + key + ".corner1").getWorld();
+                                Location loc1 = MaterialsConfig.get().getLocation("materials." + key + ".corner1"); // Location 1
+                                Location loc2 = MaterialsConfig.get().getLocation("materials." + key + ".corner2"); // Location 2
+
+                                int minX = Math.min(loc1.getBlockX(), loc2.getBlockX());
+                                int minY = Math.min(loc1.getBlockY(), loc2.getBlockY());
+                                int minZ = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
+
+                                int maxX = Math.max(loc1.getBlockX(), loc2.getBlockX());
+                                int maxY = Math.max(loc1.getBlockY(), loc2.getBlockY());
+                                int maxZ = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
+
+                                for (int x = minX; x <= maxX; x++) {
+                                    for (int y = minY; y <= maxY; y++) {
+                                        for (int z = minZ; z <= maxZ; z++) {
+                                            world.getBlockAt(x, y, z).setType(Material.SPONGE);
+                                        }
+                                    }
+                                }
+                                plugin.messagePlayer(p, "Region " + key + " has been restocked successfully.");
                             }
                         }
                         break;
