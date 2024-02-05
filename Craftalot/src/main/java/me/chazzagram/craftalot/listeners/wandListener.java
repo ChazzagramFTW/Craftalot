@@ -33,6 +33,7 @@ public class wandListener implements Listener {
                     case LEFT_CLICK_BLOCK:
                         plugin.wandSystem.get(p.getUniqueId()).setCorner1(e.getClickedBlock().getLocation());
                         plugin.messagePlayer(p, "§aSet first location §e(" + e.getClickedBlock().getLocation().getBlockX() + " " + e.getClickedBlock().getLocation().getBlockY() + " " + e.getClickedBlock().getLocation().getBlockZ() + ", in " + e.getClickedBlock().getLocation().getWorld().getName() + ")");
+                        e.setCancelled(true);
                         break;
                     case RIGHT_CLICK_BLOCK:
                         plugin.wandSystem.get(p.getUniqueId()).setCorner2(e.getClickedBlock().getLocation());

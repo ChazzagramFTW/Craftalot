@@ -37,6 +37,8 @@ public final class Craftalot extends JavaPlugin implements Listener {
     public HashMap<UUID, playerInfo> pointSystem;
     public HashMap<UUID, wandInfo> wandSystem;
 
+    public HashMap<UUID, String> selectedRegion;
+
 
     @Override
     public void onEnable() {
@@ -45,6 +47,8 @@ public final class Craftalot extends JavaPlugin implements Listener {
         this.pointSystem = new HashMap<>();
 
         this.wandSystem = new HashMap<>();
+
+        this.selectedRegion = new HashMap<>();
 
         instance = this;
 

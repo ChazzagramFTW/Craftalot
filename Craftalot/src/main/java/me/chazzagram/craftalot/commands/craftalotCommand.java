@@ -56,6 +56,7 @@ public class craftalotCommand implements CommandExecutor {
 
     static public Entity edguard;
     public static Inventory gui = Bukkit.createInventory(null, 27, "§6Craftalot GUI");
+    public static Inventory regionblocks = Bukkit.createInventory(null, 27, "§6Region Blocks");
     static int count = 0;
 
     boolean regionExists = false;
@@ -370,13 +371,46 @@ public class craftalotCommand implements CommandExecutor {
 
                     case "listregions":
                         if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
-                            plugin.messagePlayer(p, "Currently no material regions exist to be restocked.");
+                            plugin.messagePlayer(p, "Currently no material regions exist.");
                         } else {
                             plugin.messagePlayer(p, "Regions list:");
                             ConfigurationSection section = MaterialsConfig.get().getConfigurationSection("materials.");
                             for (String key : section.getKeys(false)) {
                                 p.sendMessage("- §6" + key);
                             }
+                        }
+                        break;
+
+                    case "setblocks":
+                        if (args.length > 1) {
+                            if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+                                plugin.messagePlayer(p, "No material regions currently exist! Use §e/ca setregion {region-name} §7to create one.");
+                            } else {
+                                regionExists = false;
+                                for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
+                                    if (args[1].toLowerCase().equals(key)) {
+                                        regionblocks.clear();
+                                        plugin.selectedRegion.put(p.getUniqueId(), key);
+                                        plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been updated with a new region.");
+                                        List<String> regionContents = MaterialsConfig.get().getStringList("materials." + args[1] + ".blocks");
+                                        for (String regionContent : regionContents) {
+                                            Material itemSelected = Material.matchMaterial(regionContent);
+                                            regionblocks.addItem(new ItemStack(itemSelected,1));
+                                        }
+
+                                        p.openInventory(regionblocks);
+                                        regionExists = true;
+                                        break;
+                                    }
+                                }
+                                if (!regionExists) {
+                                    plugin.messagePlayer(p, "No material regions named '§6" + args[1] + "§7' currently exists. Use §e/ca setregion {region-name} §7to create one.");
+                                }
+                                regionExists = false;
+                            }
+                        } else {
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot setblocks {region-name}");
+
                         }
                         break;
 

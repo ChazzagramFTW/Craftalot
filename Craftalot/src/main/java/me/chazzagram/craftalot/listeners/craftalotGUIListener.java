@@ -1,8 +1,10 @@
 package me.chazzagram.craftalot.listeners;
 
+import com.google.gson.JsonArray;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,10 +24,11 @@ import org.w3c.dom.Text;
 import java.awt.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+import java.util.List;
 
 import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
+import static me.chazzagram.craftalot.commands.craftalotCommand.regionblocks;
 
 public class craftalotGUIListener implements Listener {
     private final Inventory guiCraftlist;
@@ -130,6 +133,7 @@ public class craftalotGUIListener implements Listener {
                 CraftlistConfig.get().set("craftlist.item" + e.getSlot(), item);
                 CraftlistConfig.save();
             }
+
         } else if (e.getView().getTitle().equalsIgnoreCase("§9Settings GUI")) {
             e.setCancelled(true);
             ItemStack[] menuItems = getMenuItems();
@@ -410,6 +414,17 @@ public class craftalotGUIListener implements Listener {
                 CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
                 CraftlistConfig.save();
             }
+        } else if (e.getView().getTitle().equalsIgnoreCase("§6Region Blocks")) {
+            Player p = (Player) e.getPlayer();
+
+            List<String> blocks = new ArrayList<>(List.of());
+            for (int i = 0; i <= 26; i++) {
+                if(regionblocks.getItem(i) != null) {
+                    blocks.add(regionblocks.getItem(i).getType().name());
+                }
+            }
+            MaterialsConfig.get().set("materials." + plugin.selectedRegion.get(p.getUniqueId()) + ".blocks", blocks);
+            MaterialsConfig.save();
         }
     }
 
