@@ -304,8 +304,6 @@ public class craftalotCommand implements CommandExecutor {
                                         plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
                                         MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
                                         MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
-                                        String[] blocks = { "STONE" };
-                                        MaterialsConfig.get().set("materials." + args[1] + ".blocks", blocks);
                                         MaterialsConfig.save();
                                     }
                                     regionExists = false;
@@ -430,6 +428,11 @@ public class craftalotCommand implements CommandExecutor {
                                 Location loc2 = MaterialsConfig.get().getLocation("materials." + key + ".corner2"); // Location 2
 
                                 List<String> keyBlocks = MaterialsConfig.get().getStringList("materials." + key + ".blocks");
+
+                                if(keyBlocks.isEmpty()) {
+                                    plugin.messagePlayer(p, "Region " + key + " has no blocks, use /ca setblocks " + key + " to add blocks.");
+                                    continue;
+                                }
 
                                 int minX = Math.min(loc1.getBlockX(), loc2.getBlockX());
                                 int minY = Math.min(loc1.getBlockY(), loc2.getBlockY());
