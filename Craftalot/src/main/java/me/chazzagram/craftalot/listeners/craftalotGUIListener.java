@@ -6,6 +6,7 @@ import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
+import me.chazzagram.craftalot.playerInfo.settingsInfo;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -37,8 +38,8 @@ public class craftalotGUIListener implements Listener {
 
     private Player settingsUser;
     private String selectedLocation;
-    private String currentSetting;
     private final Craftalot plugin;
+    public HashMap<UUID, settingsInfo> currentSetting;
 
     public craftalotGUIListener(Craftalot plugin) {
         this.plugin = plugin;
@@ -46,7 +47,7 @@ public class craftalotGUIListener implements Listener {
         this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
         this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
         this.selectedLocation = "x";
-        this.currentSetting = "";
+        this.currentSetting = new HashMap<>();
 
 
     }
@@ -139,6 +140,9 @@ public class craftalotGUIListener implements Listener {
             ItemStack[] menuItems = getMenuItems();
             switch (e.getSlot()) {
                 case 10:
+                    currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.time-limit-in-seconds", null));
+                    p.closeInventory();
+                    plugin.messagePlayer(p, "§aPlease enter the time limit in seconds:");
                     break;
                 case 11:
                     if (plugin.getConfig().getString("craftalot.time-of-day").equals("day")) {
@@ -176,9 +180,7 @@ public class craftalotGUIListener implements Listener {
                     break;
                 case 14:
                     if (e.getClick().isLeftClick()) {
-                        currentSetting = "craftalot.lobby-location";
-                        selectedLocation = "x";
-                        settingsUser = p;
+                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.lobby-location", "x"));
                         p.closeInventory();
                         plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
                     } else if (e.getClick().isRightClick()) {
@@ -189,9 +191,7 @@ public class craftalotGUIListener implements Listener {
                     break;
                 case 15:
                     if (e.getClick().isLeftClick()) {
-                        currentSetting = "craftalot.game-begin-location";
-                        selectedLocation = "x";
-                        settingsUser = p;
+                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.game-begin-location", "x"));
                         p.closeInventory();
                         plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
                     } else if (e.getClick().isRightClick()) {
@@ -202,9 +202,7 @@ public class craftalotGUIListener implements Listener {
                     break;
                 case 16:
                     if (e.getClick().isLeftClick()) {
-                        currentSetting = "craftalot.edguard-location";
-                        selectedLocation = "x";
-                        settingsUser = p;
+                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.edguard-location", "x"));
                         p.closeInventory();
                         plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
                     } else if (e.getClick().isRightClick()) {
@@ -248,7 +246,9 @@ public class craftalotGUIListener implements Listener {
                     }
                     gameRunning.setGameRunning(true);
 
-                    new gameRunning(true, plugin.getConfig().getInt("craftalot.time-limit-in-seconds"), plugin) {
+                    int timeLimit = Integer.parseInt(plugin.getConfig().getString("craftalot.time-limit-in-seconds"));
+
+                    new gameRunning(true, timeLimit, plugin) {
 
                         @Override
                         public void count(int current) {
@@ -432,46 +432,60 @@ public class craftalotGUIListener implements Listener {
     public void playerChatEvent(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
         String message = e.getMessage();
-        if (p == settingsUser) {
-            switch (selectedLocation) {
-                case "x":
-                    plugin.getConfig().set(currentSetting + ".x", message);
-                    plugin.messagePlayer(p, "§a✔");
-                    plugin.messagePlayer(p, "§ePlease enter the Y coordinate:");
-                    selectedLocation = "y";
+        if (currentSetting.containsKey(p.getUniqueId())) {
+            switch (currentSetting.get(p.getUniqueId()).getSetting()) {
+                case "craftalot.edguard-location":
+                case "craftalot.lobby-location":
+                case "craftalot.game-begin-location":
+                    switch (currentSetting.get(p.getUniqueId()).getArg1()) {
+                        case "x":
+                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".x", message);
+                            plugin.messagePlayer(p, "§a✔");
+                            plugin.messagePlayer(p, "§ePlease enter the Y coordinate:");
+                            currentSetting.get(p.getUniqueId()).setArg1("y");
+                            break;
+                        case "y":
+                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".y", message);
+                            plugin.messagePlayer(p, "§a✔");
+                            plugin.messagePlayer(p, "§ePlease enter the Z coordinate:");
+                            currentSetting.get(p.getUniqueId()).setArg1("z");
+                            break;
+                        case "z":
+                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".z", message);
+                            plugin.messagePlayer(p, "§a✔");
+                            plugin.messagePlayer(p, "§ePlease enter the world name:");
+                            currentSetting.get(p.getUniqueId()).setArg1("world");
+                            break;
+                        case "world":
+                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".world", message);
+                            plugin.messagePlayer(p, "§a✔");
+                            plugin.messagePlayer(p, "§ePlease enter the pitch direction.");
+                            currentSetting.get(p.getUniqueId()).setArg1("pitch");
+                            break;
+                        case "pitch":
+                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".pitch", message);
+                            plugin.messagePlayer(p, "§a✔");
+                            plugin.messagePlayer(p, "§ePlease enter the yaw direction.");
+                            currentSetting.get(p.getUniqueId()).setArg1("yaw");
+                            break;
+                        case "yaw":
+                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".yaw", message);
+                            plugin.messagePlayer(p, "§a✔");
+                            Bukkit.getScheduler().runTask(plugin, () -> {
+                                plugin.saveConfig();
+                                p.openInventory(guiSettings);
+                            });
+                            currentSetting.get(p.getUniqueId()).setArg1("x");
+                            break;
+                    }
                     break;
-                case "y":
-                    plugin.getConfig().set(currentSetting + ".y", message);
-                    plugin.messagePlayer(p, "§a✔");
-                    plugin.messagePlayer(p, "§ePlease enter the Z coordinate:");
-                    selectedLocation = "z";
-                    break;
-                case "z":
-                    plugin.getConfig().set(currentSetting + ".z", message);
-                    plugin.messagePlayer(p, "§a✔");
-                    plugin.messagePlayer(p, "§ePlease enter the world name:");
-                    selectedLocation = "world";
-                    break;
-                case "world":
-                    plugin.getConfig().set(currentSetting + ".world", message);
-                    plugin.messagePlayer(p, "§a✔");
-                    plugin.messagePlayer(p, "§ePlease enter the pitch direction.");
-                    selectedLocation = "pitch";
-                    break;
-                case "pitch":
-                    plugin.getConfig().set(currentSetting + ".pitch", message);
-                    plugin.messagePlayer(p, "§a✔");
-                    plugin.messagePlayer(p, "§ePlease enter the yaw direction.");
-                    selectedLocation = "yaw";
-                    break;
-                case "yaw":
-                    plugin.getConfig().set(currentSetting + ".yaw", message);
+                case "craftalot.time-limit-in-seconds":
+                    plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting(), message);
                     plugin.messagePlayer(p, "§a✔");
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         plugin.saveConfig();
                         p.openInventory(guiSettings);
                     });
-                    selectedLocation = "x";
                     settingsUser = null;
                     break;
             }

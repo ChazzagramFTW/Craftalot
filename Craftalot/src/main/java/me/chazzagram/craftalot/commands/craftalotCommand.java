@@ -21,7 +21,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /*
 Plugin Wish List:
@@ -302,6 +304,8 @@ public class craftalotCommand implements CommandExecutor {
                                         plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been created.");
                                         MaterialsConfig.get().set("materials." + args[1] + ".corner1", plugin.wandSystem.get(p.getUniqueId()).getCorner1());
                                         MaterialsConfig.get().set("materials." + args[1] + ".corner2", plugin.wandSystem.get(p.getUniqueId()).getCorner2());
+                                        String[] blocks = { "STONE" };
+                                        MaterialsConfig.get().set("materials." + args[1] + ".blocks", blocks);
                                         MaterialsConfig.save();
                                     }
                                     regionExists = false;
@@ -418,11 +422,14 @@ public class craftalotCommand implements CommandExecutor {
                         if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
                             plugin.messagePlayer(p, "Currently no material regions exist to be restocked.");
                         } else {
+                            Random r = new Random();
                             ConfigurationSection section = MaterialsConfig.get().getConfigurationSection("materials.");
                             for (String key : section.getKeys(false)) {
                                 World world = MaterialsConfig.get().getLocation("materials." + key + ".corner1").getWorld();
                                 Location loc1 = MaterialsConfig.get().getLocation("materials." + key + ".corner1"); // Location 1
                                 Location loc2 = MaterialsConfig.get().getLocation("materials." + key + ".corner2"); // Location 2
+
+                                List<String> keyBlocks = MaterialsConfig.get().getStringList("materials." + key + ".blocks");
 
                                 int minX = Math.min(loc1.getBlockX(), loc2.getBlockX());
                                 int minY = Math.min(loc1.getBlockY(), loc2.getBlockY());
@@ -435,7 +442,7 @@ public class craftalotCommand implements CommandExecutor {
                                 for (int x = minX; x <= maxX; x++) {
                                     for (int y = minY; y <= maxY; y++) {
                                         for (int z = minZ; z <= maxZ; z++) {
-                                            world.getBlockAt(x, y, z).setType(Material.SPONGE);
+                                            world.getBlockAt(x, y, z).setType(Material.matchMaterial(keyBlocks.get(r.nextInt(keyBlocks.size()))));
                                         }
                                     }
                                 }
