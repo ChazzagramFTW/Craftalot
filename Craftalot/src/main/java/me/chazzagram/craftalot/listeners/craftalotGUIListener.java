@@ -3,6 +3,7 @@ package me.chazzagram.craftalot.listeners;
 import com.google.gson.JsonArray;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
+import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
@@ -10,6 +11,7 @@ import me.chazzagram.craftalot.playerInfo.settingsInfo;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,14 +30,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 
-import static me.chazzagram.craftalot.commands.craftalotCommand.edguard;
-import static me.chazzagram.craftalot.commands.craftalotCommand.regionblocks;
+import static me.chazzagram.craftalot.commands.craftalotCommand.*;
 
 public class craftalotGUIListener implements Listener {
     private final Inventory guiCraftlist;
     private final Inventory guiSettings;
     private final Inventory guiGameControl;
 
+    private int task;
     private Player settingsUser;
     private String selectedLocation;
     private final Craftalot plugin;
@@ -43,6 +45,7 @@ public class craftalotGUIListener implements Listener {
 
     public craftalotGUIListener(Craftalot plugin) {
         this.plugin = plugin;
+        this.task = 0;
         this.guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
         this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
         this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
@@ -78,7 +81,9 @@ public class craftalotGUIListener implements Listener {
                     p.sendMessage("§7Loading interface..");
                     p.closeInventory();
 
-                    guiGameControl.setItem(27, menuItems[12]);
+                    if(!gameRunning.isGameRunning()) {
+                        guiGameControl.setItem(27, menuItems[12]);
+                    } else { guiGameControl.setItem(27, menuItems[11]); }
                     guiGameControl.setItem(35, menuItems[10]);
 
                     p.openInventory(guiGameControl);
@@ -179,42 +184,26 @@ public class craftalotGUIListener implements Listener {
                     }
                     break;
                 case 14:
-                    if (e.getClick().isLeftClick()) {
-                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.lobby-location", "x"));
-                        p.closeInventory();
-                        plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
-                    } else if (e.getClick().isRightClick()) {
-                        plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
-                        p.closeInventory();
-                        plugin.messagePlayer(p, "§aLobby Location set to §fcurrent position.");
-                    }
+                    plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
+                    p.closeInventory();
+                    plugin.messagePlayer(p, "§aLobby Location set to §fcurrent position.");
+                    plugin.saveConfig();
                     break;
                 case 15:
-                    if (e.getClick().isLeftClick()) {
-                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.game-begin-location", "x"));
-                        p.closeInventory();
-                        plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
-                    } else if (e.getClick().isRightClick()) {
-                        plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
-                        p.closeInventory();
-                        plugin.messagePlayer(p, "§aGame Start Location set to §fcurrent position.");
-                    }
+                    plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
+                    p.closeInventory();
+                    plugin.messagePlayer(p, "§aGame Start Location set to §fcurrent position.");
+                    plugin.saveConfig();
                     break;
                 case 16:
-                    if (e.getClick().isLeftClick()) {
-                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.edguard-location", "x"));
-                        p.closeInventory();
-                        plugin.messagePlayer(p, "§aPlease enter the X coordinate:");
-                    } else if (e.getClick().isRightClick()) {
-                        if (craftalotCommand.schedule) {
-                            plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
-                            plugin.saveConfig();
-                            edguard.teleport(p.getLocation());
-                            plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
-                        } else {
-                            plugin.messagePlayer(p, "§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
-                        }
+                    if (schedule) {
+                        plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
+                        edguard.teleport(p.getLocation());
+                        plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
+                    } else {
+                        plugin.messagePlayer(p, "§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
                     }
+                    plugin.saveConfig();
                     break;
                 case 31:
                     p.closeInventory();
@@ -225,6 +214,18 @@ public class craftalotGUIListener implements Listener {
             e.setCancelled(true);
             switch (e.getSlot()) {
                 case 27:
+                    if (plugin.getConfig().get("craftalot.lobby-location") == null) {
+                        plugin.messagePlayer(p, "Game cannot start, lobby-location has not been configured.");
+                        break;
+                    }
+                    if (plugin.getConfig().get("craftalot.game-begin-location") == null) {
+                        plugin.messagePlayer(p, "Game cannot start, game-begin-location has not been configured.");
+                        break;
+                    }
+                    if (!schedule) {
+                        plugin.messagePlayer(p, "Game cannot start, edguard has not been spawned.");
+                        break;
+                    }
                     ItemStack[] menuItems = getMenuItems();
                     if(e.getCurrentItem().equals(menuItems[12])){
                         guiGameControl.setItem(27, menuItems[11]);
@@ -232,8 +233,9 @@ public class craftalotGUIListener implements Listener {
                         ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
                         boolean blacklisted = false;
                         for (Player player : onlinePlayers) {
-                            for (String name : plugin.getConfig().getStringList("craftalot.blacklisted-players")) {
-                                if (player.getName().equals(name)) {
+                            for (String uuidString : BlacklistConfig.get().getStringList("blacklisted-players")) {
+                                UUID uuid = UUID.fromString(uuidString);
+                                if (uuid.equals(player.getUniqueId())) {
                                     blacklisted = true;
                                 }
                             }
@@ -241,26 +243,104 @@ public class craftalotGUIListener implements Listener {
                                 plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, randomItem()));
                                 plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points, and has to craft item: " + plugin.pointSystem.get(player.getUniqueId()).getItemToCraft().getType());
                             }
-                            blacklisted = false;
+                        }
+                        gameRunning.setGameRunning(true);
+                        int timeLimit = Integer.parseInt(plugin.getConfig().getString("craftalot.time-limit-in-seconds"));
+                        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                            int time = 0;
+                            @Override
+                            public void run() {
+                                if(!gameRunning.isGameRunning()){
+                                    stopCountdown();
+                                }
+                                time++;
+                                switch (time) {
+                                    case 1:
+                                        List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+                                        for (Player player : onlinePlayers) {
+                                            plugin.messagePlayer(player, "The game is starting! Teleporting to lobby..");
+                                            boolean blacklisted = false;
+                                            if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                                for (String uuidString : blackList) {
+                                                    UUID uuid = UUID.fromString(uuidString);
+                                                    if (uuid.equals(player.getUniqueId())) {
+                                                        plugin.messagePlayer(player, "§cYou are exempt from playing, you are on the blacklist. If this is an error contact an administrator.");
+                                                        blacklisted = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if (!blacklisted) {
+                                                player.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
+                                            }
+                                        }
+                                        break;
+                                    case 5:
+                                        for (Player player : onlinePlayers) {
+                                            plugin.messagePlayer(player, "Game will commence in 30 seconds, get ready!");
+                                        }
+                                        break;
+                                    case 25:
+                                        for (Player player : onlinePlayers) {
+                                            plugin.messagePlayer(player, "Game will commence in 10 seconds..");
+                                        }
+                                        break;
+                                    case 32:
+                                        for (Player player : onlinePlayers) {
+                                            plugin.messagePlayer(player, "Game starting in 3..");
+                                        }
+                                        break;
+                                    case 33:
+                                        for (Player player : onlinePlayers) {
+                                            plugin.messagePlayer(player, "Game starting in 2..");
+                                        }
+                                        break;
+                                    case 34:
+                                        for (Player player : onlinePlayers) {
+                                            plugin.messagePlayer(player, "Game starting in 1..");
+                                        }
+                                        break;
+                                    case 35:
+                                        guiGameControl.setItem(28, menuItems[14]);
+                                        new gameRunning(true, timeLimit, plugin) {
+
+                                            @Override
+                                            public void count(int current) {
+                                                if (isGamePaused()) {
+                                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lPAUSED: " + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                                                } else {
+                                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                                                }
+                                            }
+
+                                        }.startTimer();
+                                }
+                            }
+                        }, 0, 20);
+
+                    } else {
+                        gameRunning.setGameRunning(false);
+                        gameRunning.setGamePaused(false);
+                        plugin.messagePlayer(p, "The game has been stopped.");
+                        guiGameControl.setItem(27, menuItems[12]);
+                        guiGameControl.setItem(28, null);
+                    }
+
+                    break;
+                case 28:
+                    menuItems = getMenuItems();
+                    if(gameRunning.isGameRunning()) {
+                        if (!gameRunning.isGamePaused()) {
+                            gameRunning.setGamePaused(true);
+                            guiGameControl.setItem(28, menuItems[13]);
+                            plugin.messagePlayer(p, "The game is now paused!");
+                        } else {
+                            gameRunning.setGamePaused(false);
+                            guiGameControl.setItem(28, menuItems[14]);
+                            plugin.messagePlayer(p, "The game is now resumed!");
                         }
                     }
-                    gameRunning.setGameRunning(true);
-
-                    int timeLimit = Integer.parseInt(plugin.getConfig().getString("craftalot.time-limit-in-seconds"));
-
-                    new gameRunning(true, timeLimit, plugin) {
-
-                        @Override
-                        public void count(int current) {
-                            if(isGamePaused()){
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lPAUSED: " + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
-                            } else {
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
-                            }
-                        }
-
-                    }.startTimer();
-
+                    e.setCancelled(true);
                     break;
                 case 35:
                     p.closeInventory();
@@ -286,6 +366,8 @@ public class craftalotGUIListener implements Listener {
 
         ItemStack gameRunning = new ItemStack(Material.FILLED_MAP);
         ItemStack gameWaiting = new ItemStack(Material.MAP);
+        ItemStack gamePaused = new ItemStack(Material.RED_DYE);
+        ItemStack gameResumed = new ItemStack(Material.LIME_DYE);
 
         // Settings
         ItemMeta time_limit_meta = time_limit.getItemMeta();
@@ -340,24 +422,24 @@ public class craftalotGUIListener implements Listener {
         ItemMeta lobbyloc_meta = lobbyloc.getItemMeta();
         lobbyloc_meta.setDisplayName("§7Lobby Location");
         ArrayList<String> lobbyloc_lore = new ArrayList<>();
-        lobbyloc_lore.add("§fLeft Click to manually set position.");
-        lobbyloc_lore.add("§fRight Click to set to current position.");
+        lobbyloc_lore.add("§fClick to set to current position.");
+        lobbyloc_lore.add("§fStand where you wish for this position to be set.");
         lobbyloc_meta.setLore(lobbyloc_lore);
         lobbyloc.setItemMeta(lobbyloc_meta);
 
         ItemMeta gamebeginloc_meta = gamebeginloc.getItemMeta();
         gamebeginloc_meta.setDisplayName("§7Game Start Location");
         ArrayList<String> gamebeginloc_lore = new ArrayList<>();
-        gamebeginloc_lore.add("§fLeft Click to manually set position.");
-        gamebeginloc_lore.add("§fRight Click to set to current position.");
+        gamebeginloc_lore.add("§fClick to set to current position.");
+        gamebeginloc_lore.add("§fStand where you wish for this position to be set.");
         gamebeginloc_meta.setLore(gamebeginloc_lore);
         gamebeginloc.setItemMeta(gamebeginloc_meta);
 
         ItemMeta edguardloc_meta = edguardloc.getItemMeta();
         edguardloc_meta.setDisplayName("§7Edguard Location");
         ArrayList<String> edguardloc_lore = new ArrayList<>();
-        edguardloc_lore.add("§fLeft Click to manually set position.");
-        edguardloc_lore.add("§fRight Click to set to current position.");
+        edguardloc_lore.add("§fClick to set to current position.");
+        edguardloc_lore.add("§fStand where you wish for this position to be set.");
         edguardloc_meta.setLore(edguardloc_lore);
         edguardloc.setItemMeta(edguardloc_meta);
 
@@ -370,9 +452,9 @@ public class craftalotGUIListener implements Listener {
 
         // Game Control
         ItemMeta gameRunning_meta = gameRunning.getItemMeta();
-        gameRunning_meta.setDisplayName("§7§oGame Running.");
+        gameRunning_meta.setDisplayName("§c§oStop Game.");
         ArrayList<String> gameRunning_lore = new ArrayList<>();
-        gameRunning_lore.add("§fUse pause/stop to change this.");
+        gameRunning_lore.add("§fThe game is currently running.");
         gameRunning_meta.setLore(gameRunning_lore);
         gameRunning.setItemMeta(gameRunning_meta);
 
@@ -383,7 +465,25 @@ public class craftalotGUIListener implements Listener {
         gameWaiting_meta.setLore(gameWaiting_lore);
         gameWaiting.setItemMeta(gameWaiting_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting};
+        ItemMeta gamePaused_meta = gamePaused.getItemMeta();
+        gamePaused_meta.setDisplayName("§e§oResume Game");
+        ArrayList<String> gamePaused_lore = new ArrayList<>();
+        gamePaused_lore.add("§fThe game is currently paused.");
+        gamePaused_meta.setLore(gamePaused_lore);
+        gamePaused.setItemMeta(gamePaused_meta);
+
+        ItemMeta gameResumed_meta = gameResumed.getItemMeta();
+        gameResumed_meta.setDisplayName("§e§oPause Game");
+        ArrayList<String> gameResumed_lore = new ArrayList<>();
+        gameResumed_lore.add("§fThe game is currently playing.");
+        gameResumed_meta.setLore(gameResumed_lore);
+        gameResumed.setItemMeta(gameResumed_meta);
+
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting, gamePaused, gameResumed};
+    }
+
+    public void stopCountdown(){
+        Bukkit.getScheduler().cancelTask(task);
     }
 
     public ItemStack randomItem(){
@@ -434,51 +534,6 @@ public class craftalotGUIListener implements Listener {
         String message = e.getMessage();
         if (currentSetting.containsKey(p.getUniqueId())) {
             switch (currentSetting.get(p.getUniqueId()).getSetting()) {
-                case "craftalot.edguard-location":
-                case "craftalot.lobby-location":
-                case "craftalot.game-begin-location":
-                    switch (currentSetting.get(p.getUniqueId()).getArg1()) {
-                        case "x":
-                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".x", message);
-                            plugin.messagePlayer(p, "§a✔");
-                            plugin.messagePlayer(p, "§ePlease enter the Y coordinate:");
-                            currentSetting.get(p.getUniqueId()).setArg1("y");
-                            break;
-                        case "y":
-                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".y", message);
-                            plugin.messagePlayer(p, "§a✔");
-                            plugin.messagePlayer(p, "§ePlease enter the Z coordinate:");
-                            currentSetting.get(p.getUniqueId()).setArg1("z");
-                            break;
-                        case "z":
-                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".z", message);
-                            plugin.messagePlayer(p, "§a✔");
-                            plugin.messagePlayer(p, "§ePlease enter the world name:");
-                            currentSetting.get(p.getUniqueId()).setArg1("world");
-                            break;
-                        case "world":
-                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".world", message);
-                            plugin.messagePlayer(p, "§a✔");
-                            plugin.messagePlayer(p, "§ePlease enter the pitch direction.");
-                            currentSetting.get(p.getUniqueId()).setArg1("pitch");
-                            break;
-                        case "pitch":
-                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".pitch", message);
-                            plugin.messagePlayer(p, "§a✔");
-                            plugin.messagePlayer(p, "§ePlease enter the yaw direction.");
-                            currentSetting.get(p.getUniqueId()).setArg1("yaw");
-                            break;
-                        case "yaw":
-                            plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting() + ".yaw", message);
-                            plugin.messagePlayer(p, "§a✔");
-                            Bukkit.getScheduler().runTask(plugin, () -> {
-                                plugin.saveConfig();
-                                p.openInventory(guiSettings);
-                            });
-                            currentSetting.get(p.getUniqueId()).setArg1("x");
-                            break;
-                    }
-                    break;
                 case "craftalot.time-limit-in-seconds":
                     plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting(), message);
                     plugin.messagePlayer(p, "§a✔");

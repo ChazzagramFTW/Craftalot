@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.commands;
 
 import me.chazzagram.craftalot.Craftalot;
+import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
@@ -20,10 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /*
 Plugin Wish List:
@@ -87,7 +85,7 @@ public class craftalotCommand implements CommandExecutor {
     public static void spawnEdguard(){
 
         if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
-            edguard = Bukkit.getWorld(plugin.getConfig().getString("craftalot.edguard-location.world")).spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+            edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
 
             edguard.setGravity(false);
             edguard.setCustomName("§aEdguard");
@@ -280,6 +278,38 @@ public class craftalotCommand implements CommandExecutor {
                             }
                         } else {
                             plugin.messagePlayer(p, "A game is not currently running, use /ca gui to start a game.");
+                        }
+                        break;
+
+                    case "blacklist":
+                        if (args.length > 1){
+                            if (Bukkit.getServer().getPlayer(args[1]) != null) {
+                                if (plugin.getConfig().getKeys(true).isEmpty()) {
+                                    List<String> blackList = new ArrayList<>();
+                                    blackList.add(Bukkit.getPlayer(args[1]).getUniqueId().toString());
+                                    BlacklistConfig.get().set("blacklisted-players", blackList);
+                                    BlacklistConfig.save();
+                                } else {
+                                    boolean blacklisted = false;
+                                    List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+                                    for (String uuidString : blackList) {
+                                        UUID uuid = UUID.fromString(uuidString);
+                                        if (uuid.equals(Bukkit.getPlayer(args[1]).getUniqueId())) {
+                                            plugin.messagePlayer(p, "§6'" + args[1] + "' §7is already on the blacklist.");
+                                            blacklisted = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!blacklisted) {
+                                        plugin.messagePlayer(p, "§6'" + args[1] + "' §7is now on the blacklist.");
+                                        blackList.add(Bukkit.getPlayer(args[1]).getUniqueId().toString());
+                                        BlacklistConfig.get().set("blacklisted-players", blackList);
+                                        BlacklistConfig.save();
+                                    }
+                                }
+                            } else {
+                                plugin.messagePlayer(p, "Player §6'" + args[1] + "' §7is not online, to be blacklisted the player must be online on the server. Alternatively, you can grab the UUID of the player and paste it into the §6'blacklist.yml' §7config file.");
+                            }
                         }
                         break;
 

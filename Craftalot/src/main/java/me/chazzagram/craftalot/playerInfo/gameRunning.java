@@ -45,7 +45,7 @@ public abstract class gameRunning {
             @Override
             public void run() {
                 count(time);
-                if (time-- <= 0) cancel();
+                if (time-- <= 0 || !gameRunning) cancel();
                 if (gamePaused) {
                     time++;
                 }

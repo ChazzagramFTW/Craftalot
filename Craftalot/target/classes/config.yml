@@ -15,27 +15,15 @@ craftalot:
   # Set where players will be teleported before the game begins.
   # This feature is set in-game using /ca gui.
   lobby-location:
-    x: 0
-    y: 0
-    z: 0
-    world: world
 
   # Set where players will be teleported when the game begins.
   # This feature is set in-game using /ca gui.
   game-begin-location:
-    x: 0
-    y: 0
-    z: 0
-    world: world
 
   # Configuration location for the Edguard entity.
   # It is recommended to leave this setting unchanged.
-  # Use '/ca edguard' in-game to modify Edguard's properties.
+  # Use '/ca edguard' or '/ca gui' in-game to modify Edguard's properties.
   edguard-location:
-    x: 0
-    y: 0
-    z: 0
-    world: world
 
   # Set the time of day which the game will be played in.
   # Syntax (day, night)

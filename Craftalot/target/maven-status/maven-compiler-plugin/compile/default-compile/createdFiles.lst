@@ -2,7 +2,9 @@ me\chazzagram\craftalot\playerInfo\gameRunning$1.class
 me\chazzagram\craftalot\listeners\wandListener.class
 me\chazzagram\craftalot\commands\SpawnCommand.class
 me\chazzagram\craftalot\playerInfo\settingsInfo.class
+me\chazzagram\craftalot\listeners\craftalotGUIListener$1$1.class
 me\chazzagram\craftalot\commands\craftalotCommand.class
+me\chazzagram\craftalot\files\BlacklistConfig.class
 me\chazzagram\craftalot\Craftalot.class
 me\chazzagram\craftalot\files\MaterialsConfig.class
 me\chazzagram\craftalot\listeners\wandListener$1.class
