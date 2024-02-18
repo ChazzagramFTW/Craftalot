@@ -11,8 +11,12 @@ import me.chazzagram.craftalot.playerInfo.settingsInfo;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,10 +40,9 @@ public class craftalotGUIListener implements Listener {
     private final Inventory guiCraftlist;
     private final Inventory guiSettings;
     private final Inventory guiGameControl;
+    static public List<Entity> spawnedEntities = new ArrayList<>();
 
     private int task;
-    private Player settingsUser;
-    private String selectedLocation;
     private final Craftalot plugin;
     public HashMap<UUID, settingsInfo> currentSetting;
 
@@ -49,7 +52,6 @@ public class craftalotGUIListener implements Listener {
         this.guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
         this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
         this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
-        this.selectedLocation = "x";
         this.currentSetting = new HashMap<>();
 
 
@@ -213,6 +215,8 @@ public class craftalotGUIListener implements Listener {
         } else if (e.getView().getTitle().equalsIgnoreCase("§9Game Control GUI")) {
             e.setCancelled(true);
             switch (e.getSlot()) {
+
+                // Start Game
                 case 27:
                     if (plugin.getConfig().get("craftalot.lobby-location") == null) {
                         plugin.messagePlayer(p, "Game cannot start, lobby-location has not been configured.");
@@ -322,11 +326,35 @@ public class craftalotGUIListener implements Listener {
                         gameRunning.setGameRunning(false);
                         gameRunning.setGamePaused(false);
                         plugin.messagePlayer(p, "The game has been stopped.");
+                        ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                        List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+
+                        for (Player player : onlinePlayers) {
+                            plugin.messagePlayer(player, "All players are unfrozen!");
+                            boolean blacklisted = false;
+                            if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                for (String uuidString : blackList) {
+                                    UUID uuid = UUID.fromString(uuidString);
+                                    if (uuid.equals(player.getUniqueId())) {
+                                        blacklisted = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!blacklisted) {
+                                p.setGameMode(GameMode.SURVIVAL);
+                            }
+                        }
+                        for (Entity ent : spawnedEntities) {
+                            ent.remove();
+                        }
                         guiGameControl.setItem(27, menuItems[12]);
                         guiGameControl.setItem(28, null);
                     }
 
                     break;
+
+                // Pause / Resume
                 case 28:
                     menuItems = getMenuItems();
                     if(gameRunning.isGameRunning()) {
@@ -334,10 +362,66 @@ public class craftalotGUIListener implements Listener {
                             gameRunning.setGamePaused(true);
                             guiGameControl.setItem(28, menuItems[13]);
                             plugin.messagePlayer(p, "The game is now paused!");
+
+                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                            List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+
+                            for (Player player : onlinePlayers) {
+                                plugin.messagePlayer(player, "All players are now frozen temporarily.");
+                                boolean blacklisted = false;
+                                if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                    for (String uuidString : blackList) {
+                                        UUID uuid = UUID.fromString(uuidString);
+                                        if (uuid.equals(player.getUniqueId())) {
+                                            plugin.messagePlayer(player, "§cYou are exempt from being paused, you are on the blacklist. If this is an error contact an administrator.");
+                                            blacklisted = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!blacklisted) {
+                                    Entity pausePlayer = player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
+
+                                    pausePlayer.setGravity(false);
+                                    pausePlayer.setCustomName(player.getName());
+                                    pausePlayer.setCustomNameVisible(false);
+                                    pausePlayer.setInvulnerable(true);
+
+                                    player.setGameMode(GameMode.SPECTATOR);
+                                    player.setSpectatorTarget(pausePlayer);
+
+                                    spawnedEntities.add(pausePlayer);
+
+                                }
+                            }
+
                         } else {
                             gameRunning.setGamePaused(false);
                             guiGameControl.setItem(28, menuItems[14]);
                             plugin.messagePlayer(p, "The game is now resumed!");
+
+                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                            List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+
+                            for (Player player : onlinePlayers) {
+                                plugin.messagePlayer(player, "All players are unfrozen!");
+                                boolean blacklisted = false;
+                                if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                    for (String uuidString : blackList) {
+                                        UUID uuid = UUID.fromString(uuidString);
+                                        if (uuid.equals(player.getUniqueId())) {
+                                            blacklisted = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!blacklisted) {
+                                    p.setGameMode(GameMode.SURVIVAL);
+                                }
+                            }
+                            for (Entity ent : spawnedEntities) {
+                                ent.remove();
+                            }
                         }
                     }
                     e.setCancelled(true);
@@ -541,7 +625,6 @@ public class craftalotGUIListener implements Listener {
                         plugin.saveConfig();
                         p.openInventory(guiSettings);
                     });
-                    settingsUser = null;
                     break;
             }
             e.setCancelled(true);

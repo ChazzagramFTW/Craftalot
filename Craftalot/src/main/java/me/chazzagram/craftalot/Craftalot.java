@@ -15,6 +15,7 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,6 +24,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import static me.chazzagram.craftalot.listeners.craftalotGUIListener.spawnedEntities;
 
 public final class Craftalot extends JavaPlugin implements Listener {
 
@@ -64,6 +67,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new craftalotGUIListener(this), this);
         getServer().getPluginManager().registerEvents(new edguardListener(this), this);
         getServer().getPluginManager().registerEvents(new wandListener(this), this);
+        getServer().getPluginManager().registerEvents(new PauseListener(this), this);
 
         getCommand("god").setExecutor(new GodCommand());
         getCommand("repeat").setExecutor(new RepeatCommand());
@@ -104,6 +108,9 @@ public final class Craftalot extends JavaPlugin implements Listener {
         // Plugin shutdown logic
         messageConsole("My first plugin has stopped, bye.");
 
+        for (Entity entity : spawnedEntities) {
+            entity.remove();
+        }
         craftalotCommand.despawnEdguard();
 
     }

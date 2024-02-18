@@ -8,6 +8,7 @@ me\chazzagram\craftalot\files\BlacklistConfig.class
 me\chazzagram\craftalot\Craftalot.class
 me\chazzagram\craftalot\files\MaterialsConfig.class
 me\chazzagram\craftalot\listeners\wandListener$1.class
+me\chazzagram\craftalot\listeners\PauseListener.class
 me\chazzagram\craftalot\expansion\SpigotExpansion.class
 me\chazzagram\craftalot\listeners\ShearSheepListener.class
 me\chazzagram\craftalot\listeners\craftalotGUIListener.class
