@@ -100,6 +100,7 @@ public class craftalotGUIListener implements Listener {
                     guiSettings.setItem(14, menuItems[7]);
                     guiSettings.setItem(15, menuItems[8]);
                     guiSettings.setItem(16, menuItems[9]);
+                    guiSettings.setItem(19, menuItems[15]);
                     guiSettings.setItem(31, menuItems[10]);
                     switch (plugin.getConfig().getString("craftalot.time-of-day")) {
                         case "day":
@@ -150,6 +151,11 @@ public class craftalotGUIListener implements Listener {
                     currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.time-limit-in-seconds", null));
                     p.closeInventory();
                     plugin.messagePlayer(p, "§aPlease enter the time limit in seconds:");
+                    break;
+                case 19:
+                    currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.points.per-craft", null));
+                    p.closeInventory();
+                    plugin.messagePlayer(p, "§aPlease enter the amount of points a player earns per craft:");
                     break;
                 case 11:
                     if (plugin.getConfig().getString("craftalot.time-of-day").equals("day")) {
@@ -437,6 +443,7 @@ public class craftalotGUIListener implements Listener {
 
     private static ItemStack[] getMenuItems() {
         ItemStack time_limit = new ItemStack(Material.CLOCK);
+        ItemStack points_per = new ItemStack(Material.SUNFLOWER);
         ItemStack day_night = new ItemStack(Material.CLOCK);
         ItemStack player_visibility = new ItemStack(Material.ENDER_EYE);
         ItemStack day = new ItemStack(Material.ORANGE_STAINED_GLASS_PANE);
@@ -460,6 +467,13 @@ public class craftalotGUIListener implements Listener {
         time_limit_lore.add("§fSet how long the game will last!");
         time_limit_meta.setLore(time_limit_lore);
         time_limit.setItemMeta(time_limit_meta);
+
+        ItemMeta points_per_meta = points_per.getItemMeta();
+        points_per_meta.setDisplayName("§ePoints-per-craft");
+        ArrayList<String> points_per_lore = new ArrayList<>();
+        points_per_lore.add("§fSet the amount of points earned per craft.");
+        points_per_meta.setLore(points_per_lore);
+        points_per.setItemMeta(points_per_meta);
 
         ItemMeta day_night_meta = day_night.getItemMeta();
         day_night_meta.setDisplayName("§eTime of Day");
@@ -563,7 +577,7 @@ public class craftalotGUIListener implements Listener {
         gameResumed_meta.setLore(gameResumed_lore);
         gameResumed.setItemMeta(gameResumed_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting, gamePaused, gameResumed};
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting, gamePaused, gameResumed, points_per};
     }
 
     public void stopCountdown(){
@@ -619,6 +633,7 @@ public class craftalotGUIListener implements Listener {
         if (currentSetting.containsKey(p.getUniqueId())) {
             switch (currentSetting.get(p.getUniqueId()).getSetting()) {
                 case "craftalot.time-limit-in-seconds":
+                case "craftalot.points.per-craft":
                     plugin.getConfig().set(currentSetting.get(p.getUniqueId()).getSetting(), message);
                     plugin.messagePlayer(p, "§a✔");
                     Bukkit.getScheduler().runTask(plugin, () -> {
