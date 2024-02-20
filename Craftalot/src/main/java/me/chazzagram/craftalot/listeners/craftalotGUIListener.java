@@ -5,6 +5,7 @@ import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.files.KitConfig;
 import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.settingsInfo;
@@ -14,10 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
@@ -40,6 +38,7 @@ public class craftalotGUIListener implements Listener {
     private final Inventory guiCraftlist;
     private final Inventory guiSettings;
     private final Inventory guiGameControl;
+    public final Inventory guiKitConfig;
     static public List<Entity> spawnedEntities = new ArrayList<>();
 
     private int task;
@@ -52,6 +51,7 @@ public class craftalotGUIListener implements Listener {
         this.guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
         this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
         this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
+        this.guiKitConfig = Bukkit.createInventory(null, 9, "§bKit Configuration");
         this.currentSetting = new HashMap<>();
 
 
@@ -63,349 +63,339 @@ public class craftalotGUIListener implements Listener {
         Player p = (Player) e.getWhoClicked();
 
         if (e.getView().getTitle().equalsIgnoreCase("§6Craftalot GUI")) {
-            e.setCancelled(true);
-            ItemStack[] menuItems = getMenuItems();
-            switch(e.getSlot()){
-                case 12:
-                    p.sendMessage("§7Loading interface..");
-                    p.closeInventory();
-                    for (int i = 0; i <= 32; i++) {
-                        ItemStack itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
-                        if (itemSelected != null) {
-                            guiCraftlist.setItem(i, itemSelected);
+            if (e.getClickedInventory() != null && e.getClickedInventory().equals(gui)) {
+                e.setCancelled(true);
+                ItemStack[] menuItems = getMenuItems();
+                switch (e.getSlot()) {
+                    case 12:
+                        p.sendMessage("§7Loading interface..");
+                        p.closeInventory();
+                        for (int i = 0; i <= 32; i++) {
+                            ItemStack itemSelected = CraftlistConfig.get().getItemStack("craftlist.item" + i);
+                            if (itemSelected != null) {
+                                guiCraftlist.setItem(i, itemSelected);
+                            }
+
                         }
+                        guiCraftlist.setItem(35, menuItems[10]);
+                        p.openInventory(guiCraftlist);
+                        break;
+                    case 13:
+                        p.sendMessage("§7Loading interface..");
+                        p.closeInventory();
 
-                    }
-                    guiCraftlist.setItem(35, menuItems[10]);
-                    p.openInventory(guiCraftlist);
-                    break;
-                case 13:
-                    p.sendMessage("§7Loading interface..");
-                    p.closeInventory();
+                        if (!gameRunning.isGameRunning()) {
+                            guiGameControl.setItem(27, menuItems[12]);
+                        } else {
+                            guiGameControl.setItem(27, menuItems[11]);
+                        }
+                        guiGameControl.setItem(35, menuItems[10]);
 
-                    if(!gameRunning.isGameRunning()) {
-                        guiGameControl.setItem(27, menuItems[12]);
-                    } else { guiGameControl.setItem(27, menuItems[11]); }
-                    guiGameControl.setItem(35, menuItems[10]);
+                        p.openInventory(guiGameControl);
+                        break;
+                    case 14:
+                        p.sendMessage("§7Loading interface..");
+                        p.closeInventory();
 
-                    p.openInventory(guiGameControl);
-                    break;
-                case 14:
-                    p.sendMessage("§7Loading interface..");
-                    p.closeInventory();
-
-                    guiSettings.setItem(10, menuItems[0]);
-                    guiSettings.setItem(11, menuItems[1]);
-                    guiSettings.setItem(12, menuItems[2]);
-                    guiSettings.setItem(14, menuItems[7]);
-                    guiSettings.setItem(15, menuItems[8]);
-                    guiSettings.setItem(16, menuItems[9]);
-                    guiSettings.setItem(19, menuItems[15]);
-                    guiSettings.setItem(31, menuItems[10]);
-                    switch (plugin.getConfig().getString("craftalot.time-of-day")) {
-                        case "day":
-                            guiSettings.setItem(20, menuItems[3]);
-                            break;
-                        case "night":
-                            guiSettings.setItem(20, menuItems[4]);
-                            break;
-                        default:
-                            plugin.messagePlayer(p, "Invalid configuration for 'time of day', toggle the setting to fix.");
-                            break;
-                    }
-                    switch (plugin.getConfig().getString("craftalot.player-visibility")) {
-                        case "true":
-                            guiSettings.setItem(21, menuItems[5]);
-                            break;
-                        case "false":
-                            guiSettings.setItem(21, menuItems[6]);
-                            break;
-                        default:
-                            plugin.messagePlayer(p, "Invalid configuration for 'player visibility', toggle the setting to fix.");
-                            break;
-                    }
-                    p.openInventory(guiSettings);
-                    break;
+                        guiSettings.setItem(10, menuItems[0]);
+                        guiSettings.setItem(11, menuItems[1]);
+                        guiSettings.setItem(12, menuItems[2]);
+                        guiSettings.setItem(14, menuItems[7]);
+                        guiSettings.setItem(15, menuItems[8]);
+                        guiSettings.setItem(16, menuItems[9]);
+                        guiSettings.setItem(19, menuItems[15]);
+                        guiSettings.setItem(24, menuItems[16]);
+                        guiSettings.setItem(31, menuItems[10]);
+                        switch (plugin.getConfig().getString("craftalot.time-of-day")) {
+                            case "day":
+                                guiSettings.setItem(20, menuItems[3]);
+                                break;
+                            case "night":
+                                guiSettings.setItem(20, menuItems[4]);
+                                break;
+                            default:
+                                plugin.messagePlayer(p, "Invalid configuration for 'time of day', toggle the setting to fix.");
+                                break;
+                        }
+                        switch (plugin.getConfig().getString("craftalot.player-visibility")) {
+                            case "true":
+                                guiSettings.setItem(21, menuItems[5]);
+                                break;
+                            case "false":
+                                guiSettings.setItem(21, menuItems[6]);
+                                break;
+                            default:
+                                plugin.messagePlayer(p, "Invalid configuration for 'player visibility', toggle the setting to fix.");
+                                break;
+                        }
+                        p.openInventory(guiSettings);
+                        break;
+                }
             }
 
         } else if (e.getView().getTitle().equalsIgnoreCase("§eCraftlist GUI")) {
-            if(e.getSlot() == 35) {
-                p.closeInventory();
-                for (int i = 0; i <= 32; i++) {
-                    CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
+            if (e.getClickedInventory() != null && e.getClickedInventory().equals(guiCraftlist)) {
+                if (e.getSlot() == 35) {
+                    p.closeInventory();
+                    for (int i = 0; i <= 32; i++) {
+                        CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
+                        CraftlistConfig.save();
+                    }
+                    p.openInventory(craftalotCommand.gui);
+                    e.setCancelled(true);
+                } else if (e.getSlot() >= 0 && e.getSlot() <= 34) {
+                    ItemStack item = guiCraftlist.getItem(e.getSlot());
+                    CraftlistConfig.get().set("craftlist.item" + e.getSlot(), item);
                     CraftlistConfig.save();
                 }
-                p.openInventory(craftalotCommand.gui);
-                e.setCancelled(true);
-            } else {
-                ItemStack item = guiCraftlist.getItem(e.getSlot());
-                CraftlistConfig.get().set("craftlist.item" + e.getSlot(), item);
-                CraftlistConfig.save();
             }
-
         } else if (e.getView().getTitle().equalsIgnoreCase("§9Settings GUI")) {
-            e.setCancelled(true);
-            ItemStack[] menuItems = getMenuItems();
-            switch (e.getSlot()) {
-                case 10:
-                    currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.time-limit-in-seconds", null));
-                    p.closeInventory();
-                    plugin.messagePlayer(p, "§aPlease enter the time limit in seconds:");
-                    break;
-                case 19:
-                    currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.points.per-craft", null));
-                    p.closeInventory();
-                    plugin.messagePlayer(p, "§aPlease enter the amount of points a player earns per craft:");
-                    break;
-                case 11:
-                    if (plugin.getConfig().getString("craftalot.time-of-day").equals("day")) {
-                        plugin.getConfig().set("craftalot.time-of-day", "night");
-                        plugin.saveConfig();
-                        guiSettings.setItem(20, menuItems[4]);
-
-                    } else if (plugin.getConfig().getString("craftalot.time-of-day").equals("night")) {
-                        plugin.getConfig().set("craftalot.time-of-day", "day");
-                        plugin.saveConfig();
-                        guiSettings.setItem(20, menuItems[3]);
-                    } else {
-                        plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
-                        plugin.getConfig().set("craftalot.time-of-day", "day");
-                        plugin.saveConfig();
-                        guiSettings.setItem(20, menuItems[3]);
-                    }
-                    break;
-                case 12:
-                    if (plugin.getConfig().getString("craftalot.player-visibility").equals("true")) {
-                        plugin.getConfig().set("craftalot.player-visibility", false);
-                        plugin.saveConfig();
-                        guiSettings.setItem(21, menuItems[6]);
-
-                    } else if (plugin.getConfig().getString("craftalot.player-visibility").equals("false")) {
-                        plugin.getConfig().set("craftalot.player-visibility", true);
-                        plugin.saveConfig();
-                        guiSettings.setItem(21, menuItems[5]);
-                    } else {
-                        plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
-                        plugin.getConfig().set("craftalot.player-visibility", true);
-                        plugin.saveConfig();
-                        guiSettings.setItem(21, menuItems[5]);
-                    }
-                    break;
-                case 14:
-                    plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
-                    p.closeInventory();
-                    plugin.messagePlayer(p, "§aLobby Location set to §fcurrent position.");
-                    plugin.saveConfig();
-                    break;
-                case 15:
-                    plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
-                    p.closeInventory();
-                    plugin.messagePlayer(p, "§aGame Start Location set to §fcurrent position.");
-                    plugin.saveConfig();
-                    break;
-                case 16:
-                    if (schedule) {
-                        plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
-                        edguard.teleport(p.getLocation());
-                        plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
-                    } else {
-                        plugin.messagePlayer(p, "§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
-                    }
-                    plugin.saveConfig();
-                    break;
-                case 31:
-                    p.closeInventory();
-                    p.openInventory(craftalotCommand.gui);
-                    break;
-            }
-        } else if (e.getView().getTitle().equalsIgnoreCase("§9Game Control GUI")) {
-            e.setCancelled(true);
-            switch (e.getSlot()) {
-
-                // Start Game
-                case 27:
-                    if (plugin.getConfig().get("craftalot.lobby-location") == null) {
-                        plugin.messagePlayer(p, "Game cannot start, lobby-location has not been configured.");
+            if (e.getClickedInventory() != null && e.getClickedInventory().equals(guiSettings)) {
+                e.setCancelled(true);
+                ItemStack[] menuItems = getMenuItems();
+                switch (e.getSlot()) {
+                    case 10:
+                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.time-limit-in-seconds", null));
+                        p.closeInventory();
+                        plugin.messagePlayer(p, "§aPlease enter the time limit in seconds:");
                         break;
-                    }
-                    if (plugin.getConfig().get("craftalot.game-begin-location") == null) {
-                        plugin.messagePlayer(p, "Game cannot start, game-begin-location has not been configured.");
+                    case 19:
+                        currentSetting.put(p.getUniqueId(), new settingsInfo("craftalot.points.per-craft", null));
+                        p.closeInventory();
+                        plugin.messagePlayer(p, "§aPlease enter the amount of points a player earns per craft:");
                         break;
-                    }
-                    if (!schedule) {
-                        plugin.messagePlayer(p, "Game cannot start, edguard has not been spawned.");
-                        break;
-                    }
-                    ItemStack[] menuItems = getMenuItems();
-                    if(e.getCurrentItem().equals(menuItems[12])){
-                        guiGameControl.setItem(27, menuItems[11]);
+                    case 11:
+                        if (plugin.getConfig().getString("craftalot.time-of-day").equals("day")) {
+                            plugin.getConfig().set("craftalot.time-of-day", "night");
+                            plugin.saveConfig();
+                            guiSettings.setItem(20, menuItems[4]);
 
-                        ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
-                        boolean blacklisted = false;
-                        for (Player player : onlinePlayers) {
-                            for (String uuidString : BlacklistConfig.get().getStringList("blacklisted-players")) {
-                                UUID uuid = UUID.fromString(uuidString);
-                                if (uuid.equals(player.getUniqueId())) {
-                                    blacklisted = true;
-                                }
-                            }
-                            if (!blacklisted) {
-                                plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, randomItem()));
-                                plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points, and has to craft item: " + plugin.pointSystem.get(player.getUniqueId()).getItemToCraft().getType());
+                        } else if (plugin.getConfig().getString("craftalot.time-of-day").equals("night")) {
+                            plugin.getConfig().set("craftalot.time-of-day", "day");
+                            plugin.saveConfig();
+                            guiSettings.setItem(20, menuItems[3]);
+                        } else {
+                            plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
+                            plugin.getConfig().set("craftalot.time-of-day", "day");
+                            plugin.saveConfig();
+                            guiSettings.setItem(20, menuItems[3]);
+                        }
+                        break;
+                    case 12:
+                        if (plugin.getConfig().getString("craftalot.player-visibility").equals("true")) {
+                            plugin.getConfig().set("craftalot.player-visibility", false);
+                            plugin.saveConfig();
+                            guiSettings.setItem(21, menuItems[6]);
+
+                        } else if (plugin.getConfig().getString("craftalot.player-visibility").equals("false")) {
+                            plugin.getConfig().set("craftalot.player-visibility", true);
+                            plugin.saveConfig();
+                            guiSettings.setItem(21, menuItems[5]);
+                        } else {
+                            plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
+                            plugin.getConfig().set("craftalot.player-visibility", true);
+                            plugin.saveConfig();
+                            guiSettings.setItem(21, menuItems[5]);
+                        }
+                        break;
+                    case 14:
+                        plugin.getConfig().set("craftalot.lobby-location", p.getLocation());
+                        p.closeInventory();
+                        plugin.messagePlayer(p, "§aLobby Location set to §fcurrent position.");
+                        plugin.saveConfig();
+                        break;
+                    case 15:
+                        plugin.getConfig().set("craftalot.game-begin-location", p.getLocation());
+                        p.closeInventory();
+                        plugin.messagePlayer(p, "§aGame Start Location set to §fcurrent position.");
+                        plugin.saveConfig();
+                        break;
+                    case 16:
+                        if (schedule) {
+                            plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
+                            edguard.teleport(p.getLocation());
+                            plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
+                        } else {
+                            plugin.messagePlayer(p, "§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                        }
+                        plugin.saveConfig();
+                        break;
+                    case 24:
+                        // Code
+                        p.sendMessage("§7Loading interface..");
+
+                        for (int i = 0; i <= 7; i++) {
+                            if (KitConfig.get().getItemStack("kit.item" + i) != null) {
+                                guiKitConfig.setItem(i, KitConfig.get().getItemStack("kit.item" + i));
                             }
                         }
-                        gameRunning.setGameRunning(true);
-                        int timeLimit = Integer.parseInt(plugin.getConfig().getString("craftalot.time-limit-in-seconds"));
-                        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                            int time = 0;
-                            @Override
-                            public void run() {
-                                if(!gameRunning.isGameRunning()){
-                                    stopCountdown();
-                                }
-                                time++;
-                                switch (time) {
-                                    case 1:
-                                        List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
-                                        for (Player player : onlinePlayers) {
-                                            plugin.messagePlayer(player, "The game is starting! Teleporting to lobby..");
-                                            boolean blacklisted = false;
-                                            if (!plugin.getConfig().getKeys(true).isEmpty()) {
-                                                for (String uuidString : blackList) {
-                                                    UUID uuid = UUID.fromString(uuidString);
-                                                    if (uuid.equals(player.getUniqueId())) {
-                                                        plugin.messagePlayer(player, "§cYou are exempt from playing, you are on the blacklist. If this is an error contact an administrator.");
-                                                        blacklisted = true;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            if (!blacklisted) {
-                                                player.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
-                                            }
-                                        }
-                                        break;
-                                    case 5:
-                                        for (Player player : onlinePlayers) {
-                                            plugin.messagePlayer(player, "Game will commence in 30 seconds, get ready!");
-                                        }
-                                        break;
-                                    case 25:
-                                        for (Player player : onlinePlayers) {
-                                            plugin.messagePlayer(player, "Game will commence in 10 seconds..");
-                                        }
-                                        break;
-                                    case 32:
-                                        for (Player player : onlinePlayers) {
-                                            plugin.messagePlayer(player, "Game starting in 3..");
-                                        }
-                                        break;
-                                    case 33:
-                                        for (Player player : onlinePlayers) {
-                                            plugin.messagePlayer(player, "Game starting in 2..");
-                                        }
-                                        break;
-                                    case 34:
-                                        for (Player player : onlinePlayers) {
-                                            plugin.messagePlayer(player, "Game starting in 1..");
-                                        }
-                                        break;
-                                    case 35:
-                                        guiGameControl.setItem(28, menuItems[14]);
-                                        new gameRunning(true, timeLimit, plugin) {
+                        guiKitConfig.setItem(8, menuItems[10]);
+                        p.openInventory(guiKitConfig);
+                        break;
+                    case 31:
+                        p.closeInventory();
+                        p.openInventory(craftalotCommand.gui);
+                        break;
+                }
+            }
+        } else if (e.getView().getTitle().equalsIgnoreCase("§bKit Configuration")) {
+            if (e.getClickedInventory() != null && e.getClickedInventory().equals(guiKitConfig)) {
+                if (e.getSlot() == 8) {
+                    for (int i = 0; i <= 7; i++) {
+                        KitConfig.get().set("kit.item" + i, guiKitConfig.getItem(i));
+                        KitConfig.save();
+                    }
+                    p.openInventory(guiSettings);
+                    e.setCancelled(true);
+                } else if (e.getSlot() >= 0 && e.getSlot() <= 7) {
+                    ItemStack item = guiKitConfig.getItem(e.getSlot());
+                    CraftlistConfig.get().set("kit.item" + e.getSlot(), item);
+                    CraftlistConfig.save();
+                }
+            }
+        } else if (e.getView().getTitle().equalsIgnoreCase("§9Game Control GUI")) {
+            if (e.getClickedInventory() != null && e.getClickedInventory().equals(guiGameControl)) {
+                e.setCancelled(true);
+                switch (e.getSlot()) {
 
-                                            @Override
-                                            public void count(int current) {
-                                                if (isGamePaused()) {
-                                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lPAUSED: " + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
-                                                } else {
-                                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
-                                                }
-                                            }
+                    // Start Game
+                    case 27:
+                        if (plugin.getConfig().get("craftalot.lobby-location") == null) {
+                            plugin.messagePlayer(p, "Game cannot start, lobby-location has not been configured.");
+                            break;
+                        }
+                        if (plugin.getConfig().get("craftalot.game-begin-location") == null) {
+                            plugin.messagePlayer(p, "Game cannot start, game-begin-location has not been configured.");
+                            break;
+                        }
+                        if (!schedule) {
+                            plugin.messagePlayer(p, "Game cannot start, edguard has not been spawned.");
+                            break;
+                        }
+                        ItemStack[] menuItems = getMenuItems();
+                        if (e.getCurrentItem().equals(menuItems[12])) {
+                            guiGameControl.setItem(27, menuItems[11]);
 
-                                        }.startTimer();
-                                }
-                            }
-                        }, 0, 20);
-
-                    } else {
-                        gameRunning.setGameRunning(false);
-                        gameRunning.setGamePaused(false);
-                        plugin.messagePlayer(p, "The game has been stopped.");
-                        ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
-                        List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
-
-                        for (Player player : onlinePlayers) {
-                            plugin.messagePlayer(player, "All players are unfrozen!");
+                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
                             boolean blacklisted = false;
-                            if (!plugin.getConfig().getKeys(true).isEmpty()) {
-                                for (String uuidString : blackList) {
+                            for (Player player : onlinePlayers) {
+                                for (String uuidString : BlacklistConfig.get().getStringList("blacklisted-players")) {
                                     UUID uuid = UUID.fromString(uuidString);
                                     if (uuid.equals(player.getUniqueId())) {
                                         blacklisted = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!blacklisted) {
-                                p.setGameMode(GameMode.SURVIVAL);
-                            }
-                        }
-                        for (Entity ent : spawnedEntities) {
-                            ent.remove();
-                        }
-                        guiGameControl.setItem(27, menuItems[12]);
-                        guiGameControl.setItem(28, null);
-                    }
-
-                    break;
-
-                // Pause / Resume
-                case 28:
-                    menuItems = getMenuItems();
-                    if(gameRunning.isGameRunning()) {
-                        if (!gameRunning.isGamePaused()) {
-                            gameRunning.setGamePaused(true);
-                            guiGameControl.setItem(28, menuItems[13]);
-                            plugin.messagePlayer(p, "The game is now paused!");
-
-                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
-                            List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
-
-                            for (Player player : onlinePlayers) {
-                                plugin.messagePlayer(player, "All players are now frozen temporarily.");
-                                boolean blacklisted = false;
-                                if (!plugin.getConfig().getKeys(true).isEmpty()) {
-                                    for (String uuidString : blackList) {
-                                        UUID uuid = UUID.fromString(uuidString);
-                                        if (uuid.equals(player.getUniqueId())) {
-                                            plugin.messagePlayer(player, "§cYou are exempt from being paused, you are on the blacklist. If this is an error contact an administrator.");
-                                            blacklisted = true;
-                                            break;
-                                        }
                                     }
                                 }
                                 if (!blacklisted) {
-                                    Entity pausePlayer = player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
-
-                                    pausePlayer.setGravity(false);
-                                    pausePlayer.setCustomName(player.getName());
-                                    pausePlayer.setCustomNameVisible(false);
-                                    pausePlayer.setInvulnerable(true);
-
-                                    player.setGameMode(GameMode.SPECTATOR);
-                                    player.setSpectatorTarget(pausePlayer);
-
-                                    spawnedEntities.add(pausePlayer);
-
+                                    plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, randomItem()));
+                                    plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points, and has to craft item: " + plugin.pointSystem.get(player.getUniqueId()).getItemToCraft().getType());
                                 }
                             }
+                            gameRunning.setGameRunning(true);
+                            int timeLimit = Integer.parseInt(plugin.getConfig().getString("craftalot.time-limit-in-seconds"));
+                            task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                                int time = 0;
+
+                                @Override
+                                public void run() {
+                                    if (!gameRunning.isGameRunning()) {
+                                        stopCountdown();
+                                    }
+                                    time++;
+                                    switch (time) {
+                                        case 1:
+                                            List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "The game is starting! Teleporting to lobby..");
+                                                boolean blacklisted = false;
+                                                if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                                    for (String uuidString : blackList) {
+                                                        UUID uuid = UUID.fromString(uuidString);
+                                                        if (uuid.equals(player.getUniqueId())) {
+                                                            plugin.messagePlayer(player, "§cYou are exempt from playing, you are on the blacklist. If this is an error contact an administrator.");
+                                                            blacklisted = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                if (!blacklisted) {
+                                                    player.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
+                                                }
+                                            }
+                                            break;
+                                        case 5:
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "Game will commence in 30 seconds, get ready!");
+                                            }
+                                            break;
+                                        case 25:
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "Game will commence in 10 seconds..");
+                                            }
+                                            break;
+                                        case 32:
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "Game starting in 3..");
+                                            }
+                                            break;
+                                        case 33:
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "Game starting in 2..");
+                                            }
+                                            break;
+                                        case 34:
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "Game starting in 1..");
+                                            }
+                                            break;
+                                        case 35:
+                                            guiGameControl.setItem(28, menuItems[14]);
+
+                                            List<String> blackList2 = BlacklistConfig.get().getStringList("blacklisted-players");
+                                            for (Player player : onlinePlayers) {
+                                                plugin.messagePlayer(player, "Teleporting..");
+                                                boolean blacklisted = false;
+                                                if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                                    for (String uuidString : blackList2) {
+                                                        UUID uuid = UUID.fromString(uuidString);
+                                                        if (uuid.equals(player.getUniqueId())) {
+                                                            plugin.messagePlayer(player, "§cYou are exempt from playing, you are on the blacklist. If this is an error contact an administrator.");
+                                                            blacklisted = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                if (!blacklisted) {
+                                                    player.teleport(plugin.getConfig().getLocation("craftalot.game-begin-location"));
+                                                    for (int i = 0; i <= 7; i++) {
+                                                        if (KitConfig.get().getItemStack("kit.item" + i) != null) {
+                                                            player.getInventory().setItem(i, KitConfig.get().getItemStack("kit.item" + i));
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            // Give Kit Function
+
+                                            new gameRunning(true, timeLimit, plugin) {
+
+                                                @Override
+                                                public void count(int current) {
+                                                    if (isGamePaused()) {
+                                                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§c§lPAUSED: " + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                                                    } else {
+                                                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§e§lTime Left: §f§l" + LocalTime.of(0, current / 60, current % 60).format(DateTimeFormatter.ofPattern("mm:ss"))));
+                                                    }
+                                                }
+
+                                            }.startTimer();
+                                    }
+                                }
+                            }, 0, 20);
 
                         } else {
+                            gameRunning.setGameRunning(false);
                             gameRunning.setGamePaused(false);
-                            guiGameControl.setItem(28, menuItems[14]);
-                            plugin.messagePlayer(p, "The game is now resumed!");
-
+                            plugin.messagePlayer(p, "The game has been stopped.");
                             ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
                             List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
@@ -428,15 +418,90 @@ public class craftalotGUIListener implements Listener {
                             for (Entity ent : spawnedEntities) {
                                 ent.remove();
                             }
+                            guiGameControl.setItem(27, menuItems[12]);
+                            guiGameControl.setItem(28, null);
                         }
-                    }
-                    e.setCancelled(true);
-                    break;
-                case 35:
-                    p.closeInventory();
-                    p.openInventory(craftalotCommand.gui);
-                    e.setCancelled(true);
-                    break;
+
+                        break;
+
+                    // Pause / Resume
+                    case 28:
+                        menuItems = getMenuItems();
+                        if (gameRunning.isGameRunning()) {
+                            if (!gameRunning.isGamePaused()) {
+                                gameRunning.setGamePaused(true);
+                                guiGameControl.setItem(28, menuItems[13]);
+                                plugin.messagePlayer(p, "The game is now paused!");
+
+                                ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                                List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+
+                                for (Player player : onlinePlayers) {
+                                    plugin.messagePlayer(player, "All players are now frozen temporarily.");
+                                    boolean blacklisted = false;
+                                    if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                        for (String uuidString : blackList) {
+                                            UUID uuid = UUID.fromString(uuidString);
+                                            if (uuid.equals(player.getUniqueId())) {
+                                                plugin.messagePlayer(player, "§cYou are exempt from being paused, you are on the blacklist. If this is an error contact an administrator.");
+                                                blacklisted = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!blacklisted) {
+                                        Entity pausePlayer = player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
+
+                                        pausePlayer.setGravity(false);
+                                        pausePlayer.setCustomName(player.getName());
+                                        pausePlayer.setCustomNameVisible(false);
+                                        pausePlayer.setInvulnerable(true);
+
+                                        player.setGameMode(GameMode.SPECTATOR);
+                                        player.setSpectatorTarget(pausePlayer);
+
+                                        spawnedEntities.add(pausePlayer);
+
+                                    }
+                                }
+
+                            } else {
+                                gameRunning.setGamePaused(false);
+                                guiGameControl.setItem(28, menuItems[14]);
+                                plugin.messagePlayer(p, "The game is now resumed!");
+
+                                ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                                List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+
+                                for (Player player : onlinePlayers) {
+                                    plugin.messagePlayer(player, "All players are unfrozen!");
+                                    boolean blacklisted = false;
+                                    if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                                        for (String uuidString : blackList) {
+                                            UUID uuid = UUID.fromString(uuidString);
+                                            if (uuid.equals(player.getUniqueId())) {
+                                                blacklisted = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!blacklisted) {
+                                        p.setGameMode(GameMode.SURVIVAL);
+                                    }
+                                }
+                                for (Entity ent : spawnedEntities) {
+                                    ent.remove();
+                                }
+                            }
+                        }
+                        e.setCancelled(true);
+                        break;
+                    case 35:
+                        p.closeInventory();
+                        p.openInventory(craftalotCommand.gui);
+                        e.setCancelled(true);
+                        break;
+                }
             }
         }
     }
@@ -454,6 +519,7 @@ public class craftalotGUIListener implements Listener {
         ItemStack gamebeginloc = new ItemStack(Material.COMPASS);
         ItemStack edguardloc = new ItemStack(Material.COMPASS);
         ItemStack goback = new ItemStack(Material.ARROW);
+        ItemStack setkit = new ItemStack(Material.TRIDENT);
 
         ItemStack gameRunning = new ItemStack(Material.FILLED_MAP);
         ItemStack gameWaiting = new ItemStack(Material.MAP);
@@ -541,6 +607,14 @@ public class craftalotGUIListener implements Listener {
         edguardloc_meta.setLore(edguardloc_lore);
         edguardloc.setItemMeta(edguardloc_meta);
 
+        ItemMeta setkit_meta = setkit.getItemMeta();
+        setkit_meta.setDisplayName("§7Kit Configuration");
+        ArrayList<String> setkit_lore = new ArrayList<>();
+        setkit_lore.add("§fOpen the kit editor for the game.");
+        setkit_lore.add("§fMake sure to have the items prepared!");
+        setkit_meta.setLore(setkit_lore);
+        setkit.setItemMeta(setkit_meta);
+
         ItemMeta goback_meta = goback.getItemMeta();
         goback_meta.setDisplayName("§e§oGo Back");
         ArrayList<String> goback_lore = new ArrayList<>();
@@ -577,7 +651,7 @@ public class craftalotGUIListener implements Listener {
         gameResumed_meta.setLore(gameResumed_lore);
         gameResumed.setItemMeta(gameResumed_meta);
 
-        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting, gamePaused, gameResumed, points_per};
+        return new ItemStack[]{time_limit, day_night, player_visibility, day, night, valid, invalid, lobbyloc, gamebeginloc, edguardloc, goback, gameRunning, gameWaiting, gamePaused, gameResumed, points_per, setkit};
     }
 
     public void stopCountdown(){
@@ -601,7 +675,13 @@ public class craftalotGUIListener implements Listener {
                 CraftlistConfig.get().set("craftlist.item" + i, guiCraftlist.getItem(i));
                 CraftlistConfig.save();
             }
+        } else if (e.getView().getTitle().equalsIgnoreCase("§bKit Configuration")){
+            for (int i = 0; i <= 7; i++) {
+                KitConfig.get().set("kit.item" + i, guiKitConfig.getItem(i));
+                KitConfig.save();
+            }
         }
+
     }
 
     @EventHandler
@@ -623,6 +703,13 @@ public class craftalotGUIListener implements Listener {
             }
             MaterialsConfig.get().set("materials." + plugin.selectedRegion.get(p.getUniqueId()) + ".blocks", blocks);
             MaterialsConfig.save();
+        }
+
+        else if (e.getView().getTitle().equalsIgnoreCase("§bKit Configuration")){
+            for (int i = 0; i <= 7; i++) {
+                KitConfig.get().set("kit.item" + i, guiKitConfig.getItem(i));
+                KitConfig.save();
+            }
         }
     }
 

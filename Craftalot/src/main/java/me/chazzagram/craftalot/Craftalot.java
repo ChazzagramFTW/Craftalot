@@ -4,6 +4,7 @@ import me.chazzagram.craftalot.commands.*;
 import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
+import me.chazzagram.craftalot.files.KitConfig;
 import me.chazzagram.craftalot.files.MaterialsConfig;
 import me.chazzagram.craftalot.listeners.*;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
@@ -95,6 +96,11 @@ public final class Craftalot extends JavaPlugin implements Listener {
         BlacklistConfig.get().addDefault("blacklisted-players", "");
         BlacklistConfig.get().options().copyDefaults();
         BlacklistConfig.save();
+
+        KitConfig.setup();
+        KitConfig.get().addDefault("kit", null);
+        KitConfig.get().options().copyDefaults();
+        KitConfig.save();
 
         getConfig().options().copyDefaults();
         saveDefaultConfig();
