@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.playerInfo;
 
 import me.chazzagram.craftalot.Craftalot;
+import me.chazzagram.craftalot.listeners.craftalotGUIListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -13,6 +14,7 @@ public abstract class gameRunning {
     protected static BukkitTask timer;
 
     protected final Craftalot plugin;
+    private final craftalotGUIListener listenerInstance;
 
     public abstract void count(int current);
 
@@ -22,6 +24,7 @@ public abstract class gameRunning {
         this.gameRunning = gameRunning;
         this.plugin = plugin;
         this.time = time;
+        this.listenerInstance = new craftalotGUIListener(plugin);
     }
 
     public static boolean isGameRunning() {
@@ -45,7 +48,10 @@ public abstract class gameRunning {
             @Override
             public void run() {
                 count(time);
-                if (time-- <= 0 || !gameRunning) cancel();
+                if (time-- <= 0 || !gameRunning) {
+                    listenerInstance.stopGame();
+                    cancel();
+                }
                 if (gamePaused) {
                     time++;
                 }

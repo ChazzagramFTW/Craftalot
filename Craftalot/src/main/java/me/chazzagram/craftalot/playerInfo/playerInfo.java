@@ -24,9 +24,7 @@ public class playerInfo {
 
     public ItemStack getItemToCraft(){ return itemToCraft; }
 
-    public void setPoints(int points) {
-        this.points = points;
-    }
+    public void setPoints(int points) { this.points = getPoints() + points; }
 
     public void setTeamName(String teamName) {
         this.teamName = teamName;

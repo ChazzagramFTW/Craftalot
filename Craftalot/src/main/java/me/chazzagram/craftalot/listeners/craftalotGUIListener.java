@@ -286,8 +286,8 @@ public class craftalotGUIListener implements Listener {
                                     }
                                 }
                                 if (!blacklisted) {
-                                    plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, randomItem()));
-                                    plugin.messagePlayer(p, player.getName() + " has been added to team: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + " and has " + plugin.pointSystem.get(player.getUniqueId()).getPoints() + " points, and has to craft item: " + plugin.pointSystem.get(player.getUniqueId()).getItemToCraft().getType());
+                                    plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, null));
+                                    plugin.messagePlayer(player,"Your info:\nTeam: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + "\nPoints: " + plugin.pointSystem.get(player.getUniqueId()).getPoints());
                                 }
                             }
                             gameRunning.setGameRunning(true);
@@ -353,6 +353,7 @@ public class craftalotGUIListener implements Listener {
                                             List<String> blackList2 = BlacklistConfig.get().getStringList("blacklisted-players");
                                             for (Player player : onlinePlayers) {
                                                 plugin.messagePlayer(player, "Teleporting..");
+                                                plugin.messagePlayer(player, "Speak to §a§lEdguard to receive instructions!");
                                                 boolean blacklisted = false;
                                                 if (!plugin.getConfig().getKeys(true).isEmpty()) {
                                                     for (String uuidString : blackList2) {
@@ -393,33 +394,7 @@ public class craftalotGUIListener implements Listener {
                             }, 0, 20);
 
                         } else {
-                            gameRunning.setGameRunning(false);
-                            gameRunning.setGamePaused(false);
-                            plugin.messagePlayer(p, "The game has been stopped.");
-                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
-                            List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
-
-                            for (Player player : onlinePlayers) {
-                                plugin.messagePlayer(player, "All players are unfrozen!");
-                                boolean blacklisted = false;
-                                if (!plugin.getConfig().getKeys(true).isEmpty()) {
-                                    for (String uuidString : blackList) {
-                                        UUID uuid = UUID.fromString(uuidString);
-                                        if (uuid.equals(player.getUniqueId())) {
-                                            blacklisted = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!blacklisted) {
-                                    p.setGameMode(GameMode.SURVIVAL);
-                                }
-                            }
-                            for (Entity ent : spawnedEntities) {
-                                ent.remove();
-                            }
-                            guiGameControl.setItem(27, menuItems[12]);
-                            guiGameControl.setItem(28, null);
+                            stopGame();
                         }
 
                         break;
@@ -658,13 +633,34 @@ public class craftalotGUIListener implements Listener {
         Bukkit.getScheduler().cancelTask(task);
     }
 
-    public ItemStack randomItem(){
-        Random rand = new Random();
-        int slot;
-        do {
-            slot = rand.nextInt(32);
-        } while (CraftlistConfig.get().getItemStack("craftlist.item" + slot) == null);
-        return CraftlistConfig.get().getItemStack("craftlist.item" + slot);
+    public void stopGame(){
+        gameRunning.setGameRunning(false);
+        gameRunning.setGamePaused(false);
+        ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+        List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
+
+        for (Player player : onlinePlayers) {
+            plugin.messagePlayer(player, "§c§lGAME OVER!");
+            boolean blacklisted = false;
+            if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                for (String uuidString : blackList) {
+                    UUID uuid = UUID.fromString(uuidString);
+                    if (uuid.equals(player.getUniqueId())) {
+                        blacklisted = true;
+                        break;
+                    }
+                }
+            }
+            if (!blacklisted) {
+                player.setGameMode(GameMode.SURVIVAL);
+            }
+        }
+        for (Entity ent : spawnedEntities) {
+            ent.remove();
+        }
+        ItemStack[] menuItems = getMenuItems();
+        guiGameControl.setItem(27, menuItems[12]);
+        guiGameControl.setItem(28, null);
     }
 
     @EventHandler
