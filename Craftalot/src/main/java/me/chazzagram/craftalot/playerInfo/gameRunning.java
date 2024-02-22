@@ -1,6 +1,7 @@
 package me.chazzagram.craftalot.playerInfo;
 
 import me.chazzagram.craftalot.Craftalot;
+import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.listeners.craftalotGUIListener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -15,6 +16,7 @@ public abstract class gameRunning {
 
     protected final Craftalot plugin;
     private final craftalotGUIListener listenerInstance;
+    private final craftalotCommand commandListener;
 
     public abstract void count(int current);
 
@@ -25,6 +27,7 @@ public abstract class gameRunning {
         this.plugin = plugin;
         this.time = time;
         this.listenerInstance = new craftalotGUIListener(plugin);
+        this.commandListener = new craftalotCommand(plugin);
     }
 
     public static boolean isGameRunning() {
@@ -48,9 +51,15 @@ public abstract class gameRunning {
             @Override
             public void run() {
                 count(time);
-                if (time-- <= 0 || !gameRunning) {
+                if (time-- <= 0) {
                     listenerInstance.stopGame();
                     cancel();
+                }
+                if(!gameRunning){
+                    cancel();
+                }
+                if(time % Integer.parseInt(plugin.getConfig().getString("craftalot.material-restock-delay")) == 0){
+                    commandListener.restockRegions();
                 }
                 if (gamePaused) {
                     time++;

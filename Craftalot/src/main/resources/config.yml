@@ -12,6 +12,10 @@ craftalot:
   # Default: 600 (10 minutes)
   time-limit-in-seconds: 600
 
+  # Set how long the game will last for in seconds.
+  # Default: 30 (~20 times in 10 minutes)
+  material-restock-delay: 30
+
   # Set where players will be teleported before the game begins.
   # This feature is set in-game using /ca gui.
   lobby-location:

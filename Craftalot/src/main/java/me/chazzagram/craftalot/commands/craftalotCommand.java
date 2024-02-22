@@ -447,41 +447,7 @@ public class craftalotCommand implements CommandExecutor {
                         break;
 
                     case "restock":
-                        if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
-                            plugin.messagePlayer(p, "Currently no material regions exist to be restocked.");
-                        } else {
-                            Random r = new Random();
-                            ConfigurationSection section = MaterialsConfig.get().getConfigurationSection("materials.");
-                            for (String key : section.getKeys(false)) {
-                                World world = MaterialsConfig.get().getLocation("materials." + key + ".corner1").getWorld();
-                                Location loc1 = MaterialsConfig.get().getLocation("materials." + key + ".corner1"); // Location 1
-                                Location loc2 = MaterialsConfig.get().getLocation("materials." + key + ".corner2"); // Location 2
-
-                                List<String> keyBlocks = MaterialsConfig.get().getStringList("materials." + key + ".blocks");
-
-                                if(keyBlocks.isEmpty()) {
-                                    plugin.messagePlayer(p, "Region " + key + " has no blocks, use /ca setblocks " + key + " to add blocks.");
-                                    continue;
-                                }
-
-                                int minX = Math.min(loc1.getBlockX(), loc2.getBlockX());
-                                int minY = Math.min(loc1.getBlockY(), loc2.getBlockY());
-                                int minZ = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
-
-                                int maxX = Math.max(loc1.getBlockX(), loc2.getBlockX());
-                                int maxY = Math.max(loc1.getBlockY(), loc2.getBlockY());
-                                int maxZ = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
-
-                                for (int x = minX; x <= maxX; x++) {
-                                    for (int y = minY; y <= maxY; y++) {
-                                        for (int z = minZ; z <= maxZ; z++) {
-                                            world.getBlockAt(x, y, z).setType(Material.matchMaterial(keyBlocks.get(r.nextInt(keyBlocks.size()))));
-                                        }
-                                    }
-                                }
-                                plugin.messagePlayer(p, "Region " + key + " has been restocked successfully.");
-                            }
-                        }
+                        restockRegions();
                         break;
 
                     default:
@@ -493,4 +459,48 @@ public class craftalotCommand implements CommandExecutor {
         }
         return true;
     }
+
+    public void restockRegions(){
+        if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
+            plugin.messageConsole("Currently no material regions exist to be restocked.");
+        } else {
+            Random r = new Random();
+            ConfigurationSection section = MaterialsConfig.get().getConfigurationSection("materials.");
+            for (String key : section.getKeys(false)) {
+                World world = MaterialsConfig.get().getLocation("materials." + key + ".corner1").getWorld();
+                Location loc1 = MaterialsConfig.get().getLocation("materials." + key + ".corner1"); // Location 1
+                Location loc2 = MaterialsConfig.get().getLocation("materials." + key + ".corner2"); // Location 2
+
+                List<String> keyBlocks = MaterialsConfig.get().getStringList("materials." + key + ".blocks");
+
+                if(keyBlocks.isEmpty()) {
+                    plugin.messageConsole("Region " + key + " has no blocks, use /ca setblocks " + key + " to add blocks.");
+                    continue;
+                }
+
+                int minX = Math.min(loc1.getBlockX(), loc2.getBlockX());
+                int minY = Math.min(loc1.getBlockY(), loc2.getBlockY());
+                int minZ = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
+
+                int maxX = Math.max(loc1.getBlockX(), loc2.getBlockX());
+                int maxY = Math.max(loc1.getBlockY(), loc2.getBlockY());
+                int maxZ = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
+
+                for (int x = minX; x <= maxX; x++) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = minZ; z <= maxZ; z++) {
+                            world.getBlockAt(x, y, z).setType(Material.matchMaterial(keyBlocks.get(r.nextInt(keyBlocks.size()))));
+                        }
+                    }
+                }
+                plugin.messageConsole("Region " + key + " has been restocked successfully.");
+            }
+        }
+        ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+        for (Player player : onlinePlayers){
+            plugin.messagePlayer(player, "Material regions have been restocked!");
+        }
+
+    }
+
 }

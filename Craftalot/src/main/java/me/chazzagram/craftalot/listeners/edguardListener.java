@@ -18,6 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static me.chazzagram.craftalot.listeners.craftalotGUIListener.convertToDisplayName;
+
 public class edguardListener implements Listener {
 
     public HashMap<UUID, Material> playerCraft;
@@ -39,7 +41,7 @@ public class edguardListener implements Listener {
                 if (plugin.pointSystem.get(p.getUniqueId()).getItemToCraft() == null){
                     plugin.pointSystem.get(p.getUniqueId()).setItemToCraft(randomItem());
                     p.sendMessage("§7[§bEdguard§7] §eHello young squire! I am Edguard and I require your assistance!");
-                    p.sendMessage("§7[§bEdguard§7] §eYou are required to craft: §a§l" + plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType());
+                    p.sendMessage("§7[§bEdguard§7] §eYou are required to craft: §a§l" + convertToDisplayName(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType().toString()));
 
                 } else {
                     boolean itemFound = false;
@@ -54,7 +56,7 @@ public class edguardListener implements Listener {
                             plugin.pointSystem.get(p.getUniqueId()).setItemToCraft(randomItem());
                             plugin.pointSystem.get(p.getUniqueId()).setPoints(Integer.parseInt(plugin.getConfig().getString("craftalot.points.per-craft")));
                             p.sendMessage("§7[§e+" + plugin.getConfig().getString("craftalot.points.per-craft") + "pts§7] Item Crafted! Current Points: §b" + plugin.pointSystem.get(p.getUniqueId()).getPoints() + "pts");
-                            p.sendMessage("§7[§bEdguard§7] §eThank you young squire! You are now required to craft: §a§l" + plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType());
+                            p.sendMessage("§7[§bEdguard§7] §eThank you young squire! You are now required to craft: §a§l" + convertToDisplayName(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType().toString()));
                             itemFound = true;
 
                             ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
@@ -67,7 +69,7 @@ public class edguardListener implements Listener {
                         }
                     }
                     if (!itemFound) {
-                        p.sendMessage("§7[§bEdguard§7] §cYou don't seem to have brought me the right item.. I required: §a§l" + plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType());
+                        p.sendMessage("§7[§bEdguard§7] §cYou don't seem to have brought me the right item.. I required: §a§l" + convertToDisplayName(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType().toString()));
                     }
                 }
             }
