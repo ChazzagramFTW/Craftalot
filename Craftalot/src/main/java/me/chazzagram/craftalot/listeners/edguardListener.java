@@ -46,26 +46,29 @@ public class edguardListener implements Listener {
                 } else {
                     boolean itemFound = false;
                     for (ItemStack item : p.getInventory().getContents()) {
-                        if (item != null && item.isSimilar(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft())) {
-                            p.getInventory().clear();
-                            for (int i = 0; i <= 7; i++) {
-                                if (KitConfig.get().getItemStack("kit.item" + i) != null) {
-                                    p.getInventory().setItem(i, KitConfig.get().getItemStack("kit.item" + i));
+                        if (item != null) {
+                            ItemStack toCraft = plugin.pointSystem.get(p.getUniqueId()).getItemToCraft();
+                            if (item.isSimilar(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft()) || toCraft.getType() == item.getType()) {
+                                p.getInventory().clear();
+                                for (int i = 0; i <= 7; i++) {
+                                    if (KitConfig.get().getItemStack("kit.item" + i) != null) {
+                                        p.getInventory().setItem(i, KitConfig.get().getItemStack("kit.item" + i));
+                                    }
                                 }
-                            }
-                            plugin.pointSystem.get(p.getUniqueId()).setItemToCraft(randomItem());
-                            plugin.pointSystem.get(p.getUniqueId()).setPoints(Integer.parseInt(plugin.getConfig().getString("craftalot.points.per-craft")));
-                            p.sendMessage("§7[§e+" + plugin.getConfig().getString("craftalot.points.per-craft") + "pts§7] Item Crafted! Current Points: §b" + plugin.pointSystem.get(p.getUniqueId()).getPoints() + "pts");
-                            p.sendMessage("§7[§bEdguard§7] §eThank you young squire! You are now required to craft: §a§l" + convertToDisplayName(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType().toString()));
-                            itemFound = true;
+                                plugin.pointSystem.get(p.getUniqueId()).setItemToCraft(randomItem());
+                                plugin.pointSystem.get(p.getUniqueId()).setPoints(Integer.parseInt(plugin.getConfig().getString("craftalot.points.per-craft")));
+                                p.sendMessage("§7[§e+" + plugin.getConfig().getString("craftalot.points.per-craft") + "pts§7] Item Crafted! Current Points: §b" + plugin.pointSystem.get(p.getUniqueId()).getPoints() + "pts");
+                                p.sendMessage("§7[§bEdguard§7] §eThank you young squire! You are now required to craft: §a§l" + convertToDisplayName(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType().toString()));
+                                itemFound = true;
 
-                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
-                            for (Player player : onlinePlayers) {
-                                if(!player.equals(p)) {
-                                    plugin.messagePlayer(player, "Player  §e" + p.getName() + "  §7has crafted an item!");
+                                ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+                                for (Player player : onlinePlayers) {
+                                    if (!player.equals(p)) {
+                                        plugin.messagePlayer(player, "Player  §e" + p.getName() + "  §7has crafted an item!");
+                                    }
                                 }
+                                break;
                             }
-                            break;
                         }
                     }
                     if (!itemFound) {

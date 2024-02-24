@@ -209,7 +209,6 @@ public class craftalotCommand implements CommandExecutor {
                         craftlist_meta.setLore(craftlist_lore);
                         craftlist.setItemMeta(craftlist_meta);
 
-                        CraftlistConfig.get().set("craftlist.item1", craftlist);
                         CraftlistConfig.save();
 
                         ItemMeta game_meta = game.getItemMeta();

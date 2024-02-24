@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,7 +38,7 @@ import static me.chazzagram.craftalot.commands.craftalotCommand.*;
 public class craftalotGUIListener implements Listener {
     private final Inventory guiCraftlist;
     private final Inventory guiSettings;
-    private final Inventory guiGameControl;
+    public final Inventory guiGameControl;
     public final Inventory guiKitConfig;
     static public List<Entity> spawnedEntities = new ArrayList<>();
 
@@ -266,12 +267,27 @@ public class craftalotGUIListener implements Listener {
 
                     // Start Game
                     case 27:
+                        if (CraftlistConfig.get().isConfigurationSection("craftlist")) {
+                            ConfigurationSection craftlistSection = CraftlistConfig.get().getConfigurationSection("craftlist");
+                            if (craftlistSection.getKeys(false).isEmpty()) {
+                                plugin.messagePlayer(p, "Game cannot start, the craftlist is empty! Configure this in /ca gui.");
+                                break;
+                            }
+                        }
+                        if(CraftlistConfig.get().getKeys(false).isEmpty()){
+                            plugin.messagePlayer(p, "Game cannot start, the craftlist is empty! Configure this in /ca gui.");
+                            break;
+                        }
                         if (plugin.getConfig().get("craftalot.lobby-location") == null) {
                             plugin.messagePlayer(p, "Game cannot start, lobby-location has not been configured.");
                             break;
                         }
                         if (plugin.getConfig().get("craftalot.game-begin-location") == null) {
                             plugin.messagePlayer(p, "Game cannot start, game-begin-location has not been configured.");
+                            break;
+                        }
+                        if (plugin.getConfig().get("craftalot.material-restock-delay") == null) {
+                            plugin.messagePlayer(p, "Game cannot start, material-restock-delay has not been configured.");
                             break;
                         }
                         if (!schedule) {
@@ -387,6 +403,9 @@ public class craftalotGUIListener implements Listener {
 
                                                 @Override
                                                 public void count(int current) {
+                                                    if(current == 0){
+                                                        guiGameControl.setItem(28, null);
+                                                    }
                                                     ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
                                                     List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
@@ -416,10 +435,11 @@ public class craftalotGUIListener implements Listener {
                                                 }
 
                                             }.startTimer();
+                                            stopCountdown();
+                                            break;
                                     }
                                 }
                             }, 0, 20);
-
                         } else {
                             stopGame();
                         }
@@ -508,7 +528,7 @@ public class craftalotGUIListener implements Listener {
         }
     }
 
-    private static ItemStack[] getMenuItems() {
+    public static ItemStack[] getMenuItems() {
         ItemStack time_limit = new ItemStack(Material.CLOCK);
         ItemStack points_per = new ItemStack(Material.SUNFLOWER);
         ItemStack day_night = new ItemStack(Material.CLOCK);
@@ -692,12 +712,14 @@ public class craftalotGUIListener implements Listener {
                 player.getInventory().clear();
             }
         }
-        for (Entity ent : spawnedEntities) {
-            ent.remove();
+        if(!spawnedEntities.isEmpty()) {
+            for (Entity ent : spawnedEntities) {
+                ent.remove();
+            }
         }
         ItemStack[] menuItems = getMenuItems();
-        guiGameControl.setItem(27, menuItems[12]);
-        guiGameControl.setItem(28, null);
+        this.guiGameControl.setItem(28, null);
+        this.guiGameControl.setItem(27, menuItems[12]);
     }
 
     @EventHandler
