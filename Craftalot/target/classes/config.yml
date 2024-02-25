@@ -1,9 +1,3 @@
-spawn:
-  x: 0
-  y: 0
-  z: 0
-spawnOnJoin: 'true'
-
 # ------ Craftalot Config ------
 craftalot:
   prefix: "§7[§6Craftalot§7] "
@@ -50,6 +44,3 @@ craftalot:
     # Points per item crafted.
     # Default: 1
     per-craft: 1
-
-  blacklisted-players:
-    - mightybrothers1

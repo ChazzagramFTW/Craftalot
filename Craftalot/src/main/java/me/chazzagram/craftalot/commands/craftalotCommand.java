@@ -134,21 +134,55 @@ public class craftalotCommand implements CommandExecutor {
                         plugin.messagePlayer(p, "§8Craftalot Plugin Version: " + PlaceholderAPI.setPlaceholders(p, "%craftalot_version%"));
                         break;
                     case "help":
-                        p.sendMessage(
-                                """
-                                §7--- Craftalot Commands ---
-                                §6/ca help: §fThis page! Congrats!
-                                §7§oUsage: /craftalot help {1,2,3..}
-                                §6/ca wand: §fWand tool for region setup.
-                                §7§oUsage: /craftalot wand
-                                §6/ca edguard: §fCommand to control the item collector Edguard.
-                                §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
-                                §6/ca reload: §fReloads the craftlist in the config.\s
-                                §7§oUsage: /craftalot reload
-                                §6/ca version: §fCheck what version the plugin is running on.
-                                §7§oUsage: /craftalot version
-                                """
-                        );
+                        if(args.length > 1) {
+                            switch (args[1]) {
+                                case "1":
+                                    p.sendMessage(
+                                            """
+                                                    §7--- Craftalot Commands §f1/3 §7---
+                                                    §6/ca help: §fThis page! Congrats!
+                                                    §7§oUsage: /craftalot help {1,2,3..}
+                                                    §6/ca wand: §fWand tool for region setup.
+                                                    §7§oUsage: /craftalot wand
+                                                    §6/ca edguard: §fCommand to control the item collector Edguard.
+                                                    §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
+                                                    §6/ca gui: §fOpen the gui interface to control the game.\s
+                                                    §7§oUsage: /craftalot gui
+                                                    §6/ca reload: §fReloads the craftlist in the config.
+                                                    §7§oUsage: /craftalot reload
+                                                    """
+                                    );
+                                    break;
+                                case "2":
+                                    p.sendMessage(
+                                            """
+                                                    §7--- Craftalot Commands §f2/3 §7---
+                                                    §6/ca setregion: §fDefine a materials region.
+                                                    §7§oUsage: /craftalot setregion {region-name}
+                                                    §6/ca delregion: §fDelete an exisiting materials region.
+                                                    §7§oUsage: /craftalot delregion {region-name}
+                                                    §6/ca updateregion: §fUpdate region with new coordinates.
+                                                    §7§oUsage: /craftalot updatedregion {region-name}
+                                                    §6/ca listregions: §fList existing materials regions.\s
+                                                    §7§oUsage: /craftalot listregions
+                                                    §6/ca setblocks: §fSet the materials within a region.
+                                                    §7§oUsage: /craftalot setblocks {region-name}
+                                                    """
+                                    );
+                                    break;
+                                case "3":
+                                    p.sendMessage(
+                                            """
+                                                    §7--- Craftalot Commands §f3/3 §7---
+                                                    §6/ca blacklist: §fAdd players to the game blacklist.
+                                                    §7§oUsage: /craftalot blacklist {online-player}
+                                                    §6/ca restock: §fRestock existing regions manually.
+                                                    §7§oUsage: /craftalot restock
+                                                    """
+                                    );
+                                    break;
+                            }
+                        }
                         break;
                     case "edguard":
                         if(args.length > 1) {

@@ -61,20 +61,13 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         messageConsole("My first plugin has started, hello.");
 
-        getServer().getPluginManager().registerEvents(new XPBottleBreakListener(), this);
-        getServer().getPluginManager().registerEvents(new ShearSheepListener(), this);
+
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new SpawnListener(this), this);
         getServer().getPluginManager().registerEvents(new craftalotGUIListener(this), this);
         getServer().getPluginManager().registerEvents(new edguardListener(this), this);
         getServer().getPluginManager().registerEvents(new wandListener(this), this);
         getServer().getPluginManager().registerEvents(new PauseListener(this), this);
 
-        getCommand("god").setExecutor(new GodCommand());
-        getCommand("repeat").setExecutor(new RepeatCommand());
-        getCommand("setspawn").setExecutor(new setSpawnCommand(this));
-        getCommand("spawn").setExecutor(new SpawnCommand(this));
-        getCommand("spawnonjoin").setExecutor(new spawnOnJoinCommand(this));
         getCommand("craftalot").setExecutor(new craftalotCommand(this));
 
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
