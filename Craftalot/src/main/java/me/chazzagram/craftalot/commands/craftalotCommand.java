@@ -70,11 +70,11 @@ public class craftalotCommand implements CommandExecutor {
 
     public boolean checkRegion(Player p){
         if (!plugin.wandSystem.containsKey(p.getUniqueId())) {
-            plugin.messagePlayer(p, "You do not currently have a region selected! Use §e/ca wand §7to create a region.");
+            plugin.messagePlayer(p, "You do not currently have a region selected! Use §e/caa wand §7to create a region.");
             return false;
         } else {
             if (plugin.wandSystem.get(p.getUniqueId()).getCorner1() == null || plugin.wandSystem.get(p.getUniqueId()).getCorner2() == null) {
-                plugin.messagePlayer(p, "You do not currently have a region selected! Use §e/ca wand §7to create a region.");
+                plugin.messagePlayer(p, "You do not currently have a region selected! Use §e/caa wand §7to create a region.");
                 return false;
             } else {
                 return true;
@@ -118,7 +118,7 @@ public class craftalotCommand implements CommandExecutor {
         if (commandSender instanceof Player p) {
 
             if (args.length == 0) {
-                plugin.messagePlayer(p, "Type '/craftalot help' for the full command list.");
+                plugin.messagePlayer(p, "Type '/craftalotadmin help' for the full command list.");
 
             } else {
                 switch (args[0].toLowerCase()) {
@@ -140,16 +140,17 @@ public class craftalotCommand implements CommandExecutor {
                                     p.sendMessage(
                                             """
                                                     §7--- Craftalot Commands §f1/3 §7---
-                                                    §6/ca help: §fThis page! Congrats!
-                                                    §7§oUsage: /craftalot help {1,2,3..}
-                                                    §6/ca wand: §fWand tool for region setup.
-                                                    §7§oUsage: /craftalot wand
-                                                    §6/ca edguard: §fCommand to control the item collector Edguard.
-                                                    §7§oUsage: /craftalot edguard {spawn,despawn,movehere}
-                                                    §6/ca gui: §fOpen the gui interface to control the game.\s
-                                                    §7§oUsage: /craftalot gui
-                                                    §6/ca reload: §fReloads the craftlist in the config.
-                                                    §7§oUsage: /craftalot reload
+                                                    §6/caa help: §fThis page! Congrats!
+                                                    §7§oUsage: /craftalotadmin help {1,2,3..}
+                                                    §6/caa wand: §fWand tool for region setup.
+                                                    §7§oUsage: /craftalotadmin wand
+                                                    §6/caa edguard: §fCommand to control the item collector Edguard.
+                                                    §7§oUsage: /craftalotadmin edguard {spawn,despawn,movehere}
+                                                    §6/caa gui: §fOpen the gui interface to control the game.\s
+                                                    §7§oUsage: /craftalotadmin gui
+                                                    §6/caa reload: §fReloads the craftlist in the config.
+                                                    §7§oUsage: /craftalotadmin reload
+                                                    §fUse §e/caa help {number} §ffor the more pages.
                                                     """
                                     );
                                     break;
@@ -157,16 +158,17 @@ public class craftalotCommand implements CommandExecutor {
                                     p.sendMessage(
                                             """
                                                     §7--- Craftalot Commands §f2/3 §7---
-                                                    §6/ca setregion: §fDefine a materials region.
-                                                    §7§oUsage: /craftalot setregion {region-name}
-                                                    §6/ca delregion: §fDelete an exisiting materials region.
-                                                    §7§oUsage: /craftalot delregion {region-name}
-                                                    §6/ca updateregion: §fUpdate region with new coordinates.
-                                                    §7§oUsage: /craftalot updatedregion {region-name}
-                                                    §6/ca listregions: §fList existing materials regions.\s
-                                                    §7§oUsage: /craftalot listregions
-                                                    §6/ca setblocks: §fSet the materials within a region.
-                                                    §7§oUsage: /craftalot setblocks {region-name}
+                                                    §6/caa setregion: §fDefine a materials region.
+                                                    §7§oUsage: /craftalotadmin setregion {region-name}
+                                                    §6/caa delregion: §fDelete an exisiting materials region.
+                                                    §7§oUsage: /craftalotadmin delregion {region-name}
+                                                    §6/caa updateregion: §fUpdate region with new coordinates.
+                                                    §7§oUsage: /craftalotadmin updatedregion {region-name}
+                                                    §6/caa listregions: §fList existing materials regions.\s
+                                                    §7§oUsage: /craftalotadmin listregions
+                                                    §6/caa setblocks: §fSet the materials within a region.
+                                                    §7§oUsage: /craftalotadmin setblocks {region-name}
+                                                    §fUse §e/caa help {number} §ffor the more pages.
                                                     """
                                     );
                                     break;
@@ -174,14 +176,32 @@ public class craftalotCommand implements CommandExecutor {
                                     p.sendMessage(
                                             """
                                                     §7--- Craftalot Commands §f3/3 §7---
-                                                    §6/ca blacklist: §fAdd players to the game blacklist.
-                                                    §7§oUsage: /craftalot blacklist {online-player}
-                                                    §6/ca restock: §fRestock existing regions manually.
-                                                    §7§oUsage: /craftalot restock
+                                                    §6/caa blacklist: §fAdd players to the game blacklist.
+                                                    §7§oUsage: /craftalotadmin blacklist {online-player}
+                                                    §6/caa restock: §fRestock existing regions manually.
+                                                    §7§oUsage: /craftalotadmin restock
+                                                    §fUse §e/caa help {number} §ffor the more pages.
                                                     """
                                     );
                                     break;
                             }
+                        } else {
+                            p.sendMessage(
+                                    """
+                                            §7--- Craftalot Commands §f1/3 §7---
+                                            §6/caa help: §fThis page! Congrats!
+                                            §7§oUsage: /craftalotadmin help {1,2,3..}
+                                            §6/caa wand: §fWand tool for region setup.
+                                            §7§oUsage: /craftalotadmin wand
+                                            §6/caa edguard: §fCommand to control the item collector Edguard.
+                                            §7§oUsage: /craftalotadmin edguard {spawn,despawn,movehere}
+                                            §6/caa gui: §fOpen the gui interface to control the game.\s
+                                            §7§oUsage: /craftalotadmin gui
+                                            §6/caa reload: §fReloads the craftlist in the config.
+                                            §7§oUsage: /craftalotadmin reload
+                                            §fUse §e/caa help {number} §ffor the more pages.
+                                            """
+                            );
                         }
                         break;
                     case "edguard":
@@ -198,7 +218,7 @@ public class craftalotCommand implements CommandExecutor {
 
                                         plugin.messagePlayer(p, "Edguard has been spawned at your location!");
                                     } else {
-                                        plugin.messagePlayer(p, "Edguard already exists in the world! Use '/ca edguard movehere' to teleport him to your location.");
+                                        plugin.messagePlayer(p, "Edguard already exists in the world! Use '/caa edguard movehere' to teleport him to your location.");
                                     }
 
                                     break;
@@ -207,7 +227,7 @@ public class craftalotCommand implements CommandExecutor {
                                         despawnEdguard();
                                         plugin.messagePlayer(p, "Edguard has been despawned!");
                                     } else {
-                                        plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                                        plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/caa edguard spawn' to summon him to your location!");
                                     }
                                     break;
                                 case "movehere":
@@ -217,15 +237,15 @@ public class craftalotCommand implements CommandExecutor {
                                         edguard.teleport(p.getLocation());
                                         plugin.messagePlayer(p, "Edguard has been teleported to your location!");
                                     } else {
-                                        plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");
+                                        plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/caa edguard spawn' to summon him to your location!");
                                     }
                                     break;
                                 default:
-                                    plugin.messagePlayer(p, "§6Incorrect Arguement!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
+                                    plugin.messagePlayer(p, "§6Incorrect Arguement!\n§8§oUsage: /craftalotadmin edguard {spawn,despawn,movehere}");
                                     break;
                             }
                         } else {
-                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot edguard {spawn,despawn,movehere}");
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalotadmin edguard {spawn,despawn,movehere}");
                             break;
                         }
                         break;
@@ -298,7 +318,7 @@ public class craftalotCommand implements CommandExecutor {
                                 plugin.messagePlayer(p, "The game is already paused!");
                             }
                         } else {
-                            plugin.messagePlayer(p, "A game is not currently running, use /ca gui to start a game.");
+                            plugin.messagePlayer(p, "A game is not currently running, use /caa gui to start a game.");
                         }
                         break;
 
@@ -310,7 +330,7 @@ public class craftalotCommand implements CommandExecutor {
                                 plugin.messagePlayer(p, "The game is already playing!");
                             }
                         } else {
-                            plugin.messagePlayer(p, "A game is not currently running, use /ca gui to start a game.");
+                            plugin.messagePlayer(p, "A game is not currently running, use /caa gui to start a game.");
                         }
                         break;
 
@@ -372,7 +392,7 @@ public class craftalotCommand implements CommandExecutor {
                                     regionExists = false;
                                 }
                             } else {
-                                plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot setregion {region-name}");
+                                plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalotadmin setregion {region-name}");
 
                             }
                         }
@@ -400,7 +420,7 @@ public class craftalotCommand implements CommandExecutor {
                                 regionExists = false;
                             }
                         } else {
-                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot delregion {region-name}");
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalotadmin delregion {region-name}");
 
                         }
                         break;
@@ -409,7 +429,7 @@ public class craftalotCommand implements CommandExecutor {
                         if(checkRegion(p)) {
                             if (args.length > 1) {
                                 if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
-                                    plugin.messagePlayer(p, "No material regions currently exist! Use §e/ca setregion {region-name} §7to create one.");
+                                    plugin.messagePlayer(p, "No material regions currently exist! Use §e/caa setregion {region-name} §7to create one.");
                                 } else {
                                     regionExists = false;
                                     for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
@@ -423,12 +443,12 @@ public class craftalotCommand implements CommandExecutor {
                                         }
                                     }
                                     if (!regionExists) {
-                                        plugin.messagePlayer(p, "No material regions named '§6" + args[1] + "§7' currently exists. Use §e/ca setregion {region-name} §7to create one.");
+                                        plugin.messagePlayer(p, "No material regions named '§6" + args[1] + "§7' currently exists. Use §e/caa setregion {region-name} §7to create one.");
                                     }
                                     regionExists = false;
                                 }
                             } else {
-                                plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot updateregion {region-name}");
+                                plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalotadmin updateregion {region-name}");
 
                             }
                         }
@@ -449,7 +469,7 @@ public class craftalotCommand implements CommandExecutor {
                     case "setblocks":
                         if (args.length > 1) {
                             if (MaterialsConfig.get().getConfigurationSection("materials") == null) {
-                                plugin.messagePlayer(p, "No material regions currently exist! Use §e/ca setregion {region-name} §7to create one.");
+                                plugin.messagePlayer(p, "No material regions currently exist! Use §e/caa setregion {region-name} §7to create one.");
                             } else {
                                 regionExists = false;
                                 for (String key : MaterialsConfig.get().getConfigurationSection("materials").getKeys(false)) {
@@ -469,12 +489,12 @@ public class craftalotCommand implements CommandExecutor {
                                     }
                                 }
                                 if (!regionExists) {
-                                    plugin.messagePlayer(p, "No material regions named '§6" + args[1] + "§7' currently exists. Use §e/ca setregion {region-name} §7to create one.");
+                                    plugin.messagePlayer(p, "No material regions named '§6" + args[1] + "§7' currently exists. Use §e/caa setregion {region-name} §7to create one.");
                                 }
                                 regionExists = false;
                             }
                         } else {
-                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalot setblocks {region-name}");
+                            plugin.messagePlayer(p, "§6Missing Arguements!\n§8§oUsage: /craftalotadmin setblocks {region-name}");
 
                         }
                         break;
@@ -483,8 +503,10 @@ public class craftalotCommand implements CommandExecutor {
                         restockRegions();
                         break;
 
+
+
                     default:
-                        plugin.messagePlayer(p, "Invalid argument, type '/craftalot help' for the full command list.");
+                        plugin.messagePlayer(p, "Invalid argument, type '/craftalotadmin help' for the full command list.");
                         break;
                 }
 
@@ -507,7 +529,7 @@ public class craftalotCommand implements CommandExecutor {
                 List<String> keyBlocks = MaterialsConfig.get().getStringList("materials." + key + ".blocks");
 
                 if(keyBlocks.isEmpty()) {
-                    plugin.messageConsole("Region " + key + " has no blocks, use /ca setblocks " + key + " to add blocks.");
+                    plugin.messageConsole("Region " + key + " has no blocks, use /caa setblocks " + key + " to add blocks.");
                     continue;
                 }
 
@@ -529,8 +551,9 @@ public class craftalotCommand implements CommandExecutor {
                 plugin.messageConsole("Region " + key + " has been restocked successfully.");
             }
         }
-        ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
-        for (Player player : onlinePlayers){
+        ArrayList<UUID> onlinePlayers = new ArrayList<>(plugin.pointSystem.keySet());
+        for (UUID uuid : onlinePlayers) {
+            Player player = Bukkit.getPlayer(uuid);
             plugin.messagePlayer(player, "Material regions have been restocked!");
         }
 

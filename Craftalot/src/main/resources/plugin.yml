@@ -5,10 +5,15 @@ api-version: '1.20'
 authors: [Chazzagram]
 description: Craftalot game mode plugin.
 commands:
-  craftalot:
+  craftalotadmin:
     description: Main craftalot command.
     usage: /<command>
     permission: craftalot.admin
     permission-message: You don't have permission to run this command.
+    aliases:
+      - caa
+  craftalot:
+    description: Player friendly craftalot command.
+    usage: /<command>
     aliases:
       - ca

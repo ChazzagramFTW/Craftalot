@@ -1,19 +1,14 @@
 package me.chazzagram.craftalot.listeners;
 
-import com.google.gson.JsonArray;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
-import me.chazzagram.craftalot.files.BlacklistConfig;
-import me.chazzagram.craftalot.files.CraftlistConfig;
-import me.chazzagram.craftalot.files.KitConfig;
-import me.chazzagram.craftalot.files.MaterialsConfig;
+import me.chazzagram.craftalot.files.*;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.settingsInfo;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
@@ -25,9 +20,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.w3c.dom.Text;
 
-import java.awt.*;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -42,6 +36,8 @@ public class craftalotGUIListener implements Listener {
     public final Inventory guiKitConfig;
     static public List<Entity> spawnedEntities = new ArrayList<>();
 
+    public int countdownTime;
+
     private int task;
     private final Craftalot plugin;
     public HashMap<UUID, settingsInfo> currentSetting;
@@ -49,6 +45,7 @@ public class craftalotGUIListener implements Listener {
     public craftalotGUIListener(Craftalot plugin) {
         this.plugin = plugin;
         this.task = 0;
+        this.countdownTime = 0;
         this.guiCraftlist = Bukkit.createInventory(null, 36, "§eCraftlist GUI");
         this.guiSettings = Bukkit.createInventory(null, 36, "§9Settings GUI");
         this.guiGameControl = Bukkit.createInventory(null, 36, "§9Game Control GUI");
@@ -297,42 +294,50 @@ public class craftalotGUIListener implements Listener {
                         ItemStack[] menuItems = getMenuItems();
                         if (e.getCurrentItem().equals(menuItems[12])) {
                             guiGameControl.setItem(27, menuItems[11]);
-
-                            ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
                             boolean blacklisted = false;
-                            for (Player player : onlinePlayers) {
+
+                            for(Player all : Bukkit.getServer().getOnlinePlayers()){
+                                plugin.messagePlayer(all, "A craftalot game is starting in ~30 seconds! Use /ca join to join the game.");
+                            }
+
+
+                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                Player player = Bukkit.getPlayer(uuid);
                                 for (String uuidString : BlacklistConfig.get().getStringList("blacklisted-players")) {
-                                    UUID uuid = UUID.fromString(uuidString);
-                                    if (uuid.equals(player.getUniqueId())) {
+                                    UUID blacklistuuid = UUID.fromString(uuidString);
+                                    if (blacklistuuid.equals(player.getUniqueId())) {
                                         blacklisted = true;
                                     }
                                 }
                                 if (!blacklisted) {
-                                    plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, null));
+                                    plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, null, player.getInventory().getContents()));
+                                    player.getInventory().clear();
                                     plugin.messagePlayer(player,"Your info:\nTeam: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + "\nPoints: " + plugin.pointSystem.get(player.getUniqueId()).getPoints());
                                 }
                             }
                             gameRunning.setGameRunning(true);
                             int timeLimit = Integer.parseInt(plugin.getConfig().getString("craftalot.time-limit-in-seconds"));
+                            countdownTime = 0;
                             task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                                int time = 0;
 
                                 @Override
                                 public void run() {
                                     if (!gameRunning.isGameRunning()) {
                                         stopCountdown();
                                     }
-                                    time++;
-                                    switch (time) {
+                                    countdownTime++;
+                                    switch (countdownTime) {
                                         case 1:
+
                                             List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "The game is starting! Teleporting to lobby..");
                                                 boolean blacklisted = false;
                                                 if (!plugin.getConfig().getKeys(true).isEmpty()) {
                                                     for (String uuidString : blackList) {
-                                                        UUID uuid = UUID.fromString(uuidString);
-                                                        if (uuid.equals(player.getUniqueId())) {
+                                                        UUID blacklistuuid = UUID.fromString(uuidString);
+                                                        if (blacklistuuid.equals(player.getUniqueId())) {
                                                             plugin.messagePlayer(player, "§cYou are exempt from playing, you are on the blacklist. If this is an error contact an administrator.");
                                                             blacklisted = true;
                                                             break;
@@ -345,27 +350,32 @@ public class craftalotGUIListener implements Listener {
                                             }
                                             break;
                                         case 5:
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "Game will commence in 30 seconds, get ready!");
                                             }
                                             break;
                                         case 25:
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "Game will commence in 10 seconds..");
                                             }
                                             break;
                                         case 32:
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "Game starting in 3..");
                                             }
                                             break;
                                         case 33:
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "Game starting in 2..");
                                             }
                                             break;
                                         case 34:
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "Game starting in 1..");
                                             }
                                             break;
@@ -373,14 +383,15 @@ public class craftalotGUIListener implements Listener {
                                             guiGameControl.setItem(28, menuItems[14]);
 
                                             List<String> blackList2 = BlacklistConfig.get().getStringList("blacklisted-players");
-                                            for (Player player : onlinePlayers) {
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
                                                 plugin.messagePlayer(player, "Teleporting..");
                                                 plugin.messagePlayer(player, "Speak to §a§lEdguard to receive instructions!");
                                                 boolean blacklisted = false;
                                                 if (!plugin.getConfig().getKeys(true).isEmpty()) {
                                                     for (String uuidString : blackList2) {
-                                                        UUID uuid = UUID.fromString(uuidString);
-                                                        if (uuid.equals(player.getUniqueId())) {
+                                                        UUID blacklistuuid = UUID.fromString(uuidString);
+                                                        if (blacklistuuid.equals(player.getUniqueId())) {
                                                             plugin.messagePlayer(player, "§cYou are exempt from playing, you are on the blacklist. If this is an error contact an administrator.");
                                                             blacklisted = true;
                                                             break;
@@ -406,15 +417,16 @@ public class craftalotGUIListener implements Listener {
                                                     if(current == 0){
                                                         guiGameControl.setItem(28, null);
                                                     }
-                                                    ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+
                                                     List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
-                                                    for (Player player : onlinePlayers) {
+                                                    for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                        Player player = Bukkit.getPlayer(uuid);
                                                         boolean blacklisted = false;
                                                         if (!plugin.getConfig().getKeys(true).isEmpty()) {
                                                             for (String uuidString : blackList) {
-                                                                UUID uuid = UUID.fromString(uuidString);
-                                                                if (uuid.equals(player.getUniqueId())) {
+                                                                UUID blacklistuuid = UUID.fromString(uuidString);
+                                                                if (blacklistuuid.equals(player.getUniqueId())) {
                                                                     blacklisted = true;
                                                                     break;
                                                                 }
@@ -437,6 +449,12 @@ public class craftalotGUIListener implements Listener {
                                             }.startTimer();
                                             stopCountdown();
                                             break;
+                                        default:
+                                            for (UUID uuid : plugin.pointSystem.keySet()) {
+                                                Player player = Bukkit.getPlayer(uuid);
+                                                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent("§6§lGame begins soon.."));
+                                            }
+                                                break;
                                     }
                                 }
                             }, 0, 20);
@@ -455,16 +473,17 @@ public class craftalotGUIListener implements Listener {
                                 guiGameControl.setItem(28, menuItems[13]);
                                 plugin.messagePlayer(p, "The game is now paused!");
 
-                                ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+
                                 List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
-                                for (Player player : onlinePlayers) {
+                                for (UUID uuid : plugin.pointSystem.keySet()) {
+                                    Player player = Bukkit.getPlayer(uuid);
                                     plugin.messagePlayer(player, "All players are now frozen temporarily.");
                                     boolean blacklisted = false;
                                     if (!plugin.getConfig().getKeys(true).isEmpty()) {
                                         for (String uuidString : blackList) {
-                                            UUID uuid = UUID.fromString(uuidString);
-                                            if (uuid.equals(player.getUniqueId())) {
+                                            UUID blacklistuuid = UUID.fromString(uuidString);
+                                            if (blacklistuuid.equals(player.getUniqueId())) {
                                                 plugin.messagePlayer(player, "§cYou are exempt from being paused, you are on the blacklist. If this is an error contact an administrator.");
                                                 blacklisted = true;
                                                 break;
@@ -492,16 +511,17 @@ public class craftalotGUIListener implements Listener {
                                 guiGameControl.setItem(28, menuItems[14]);
                                 plugin.messagePlayer(p, "The game is now resumed!");
 
-                                ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
+
                                 List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
-                                for (Player player : onlinePlayers) {
+                                for (UUID uuid : plugin.pointSystem.keySet()) {
+                                    Player player = Bukkit.getPlayer(uuid);
                                     plugin.messagePlayer(player, "All players are unfrozen!");
                                     boolean blacklisted = false;
                                     if (!plugin.getConfig().getKeys(true).isEmpty()) {
                                         for (String uuidString : blackList) {
-                                            UUID uuid = UUID.fromString(uuidString);
-                                            if (uuid.equals(player.getUniqueId())) {
+                                            UUID blacklistuuid = UUID.fromString(uuidString);
+                                            if (blacklistuuid.equals(player.getUniqueId())) {
                                                 blacklisted = true;
                                                 break;
                                             }
@@ -688,28 +708,32 @@ public class craftalotGUIListener implements Listener {
         Bukkit.getScheduler().cancelTask(task);
     }
 
-    public void stopGame(){
+    public void stopGame() {
         gameRunning.setGameRunning(false);
         gameRunning.setGamePaused(false);
-        ArrayList<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+
         List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
-        for (Player player : onlinePlayers) {
+        for (UUID uuid : plugin.pointSystem.keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
             plugin.messagePlayer(player, "§c§lGAME OVER!");
             boolean blacklisted = false;
             if (!plugin.getConfig().getKeys(true).isEmpty()) {
                 for (String uuidString : blackList) {
-                    UUID uuid = UUID.fromString(uuidString);
-                    if (uuid.equals(player.getUniqueId())) {
+                    UUID blacklistuuid = UUID.fromString(uuidString);
+                    if (blacklistuuid.equals(player.getUniqueId())) {
                         blacklisted = true;
                         break;
                     }
                 }
             }
             if (!blacklisted) {
+                plugin.messagePlayer(player, "Your finishing points: §b&l" + plugin.pointSystem.get(player.getUniqueId()).getPoints() + "pts");
+                player.getInventory().clear();
+                player.getInventory().setContents(plugin.pointSystem.get(player.getUniqueId()).getInventoryContent());
+                plugin.pointSystem.remove(player.getUniqueId());
                 player.setGameMode(GameMode.SURVIVAL);
                 player.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
-                player.getInventory().clear();
             }
         }
         if(!spawnedEntities.isEmpty()) {
@@ -720,6 +744,7 @@ public class craftalotGUIListener implements Listener {
         ItemStack[] menuItems = getMenuItems();
         this.guiGameControl.setItem(28, null);
         this.guiGameControl.setItem(27, menuItems[12]);
+
     }
 
     @EventHandler

@@ -5,6 +5,7 @@ import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.files.KitConfig;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,8 +62,9 @@ public class edguardListener implements Listener {
                                 p.sendMessage("§7[§bEdguard§7] §eThank you young squire! You are now required to craft: §a§l" + convertToDisplayName(plugin.pointSystem.get(p.getUniqueId()).getItemToCraft().getType().toString()));
                                 itemFound = true;
 
-                                ArrayList<Player> onlinePlayers = new ArrayList<>(p.getServer().getOnlinePlayers());
-                                for (Player player : onlinePlayers) {
+                                ArrayList<UUID> onlinePlayers = new ArrayList<>(plugin.pointSystem.keySet());
+                                for (UUID uuid : onlinePlayers) {
+                                    Player player = Bukkit.getPlayer(uuid);
                                     if (!player.equals(p)) {
                                         plugin.messagePlayer(player, "Player  §e" + p.getName() + "  §7has crafted an item!");
                                     }

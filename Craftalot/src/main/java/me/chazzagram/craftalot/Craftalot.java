@@ -2,16 +2,15 @@ package me.chazzagram.craftalot;
 
 import me.chazzagram.craftalot.commands.*;
 import me.chazzagram.craftalot.expansion.SpigotExpansion;
-import me.chazzagram.craftalot.files.BlacklistConfig;
-import me.chazzagram.craftalot.files.CraftlistConfig;
-import me.chazzagram.craftalot.files.KitConfig;
-import me.chazzagram.craftalot.files.MaterialsConfig;
+import me.chazzagram.craftalot.files.*;
 import me.chazzagram.craftalot.listeners.*;
+import me.chazzagram.craftalot.playerInfo.gameRunning;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.wandInfo;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -21,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -68,7 +68,8 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new wandListener(this), this);
         getServer().getPluginManager().registerEvents(new PauseListener(this), this);
 
-        getCommand("craftalot").setExecutor(new craftalotCommand(this));
+        getCommand("craftalotadmin").setExecutor(new craftalotCommand(this));
+        getCommand("craftalot").setExecutor(new playerCommand(this));
 
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             Bukkit.getPluginManager().registerEvents(this, this);
@@ -111,6 +112,18 @@ public final class Craftalot extends JavaPlugin implements Listener {
             entity.remove();
         }
         craftalotCommand.despawnEdguard();
+
+        if(gameRunning.isGameRunning()){
+            for(UUID uuid : pointSystem.keySet()){
+                Player p = Bukkit.getPlayer(uuid);
+                plugin.messagePlayer(p, "You have left the game.");
+                p.getInventory().clear();
+                p.getInventory().setContents(plugin.pointSystem.get(p.getUniqueId()).getInventoryContent());
+                plugin.pointSystem.remove(p.getUniqueId());
+                p.setGameMode(GameMode.SURVIVAL);
+                p.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
+            }
+        }
 
     }
 
@@ -159,11 +172,16 @@ public final class Craftalot extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onLeaveBed(PlayerBedLeaveEvent event){
-
-        Player player = event.getPlayer();
-        player.sendMessage("You left a bed. Dork. Kill Yourself.");
-        player.setHealth(0);
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player p = event.getPlayer();
+        if(pointSystem.containsKey(p.getUniqueId())) {
+            plugin.messagePlayer(p, "You have left the game.");
+            p.getInventory().clear();
+            p.getInventory().setContents(plugin.pointSystem.get(p.getUniqueId()).getInventoryContent());
+            plugin.pointSystem.remove(p.getUniqueId());
+            p.setGameMode(GameMode.SURVIVAL);
+            p.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
+        }
     }
 
 
