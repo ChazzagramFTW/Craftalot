@@ -38,6 +38,7 @@ public class playerCommand implements CommandExecutor {
                                 plugin.pointSystem.put(p.getUniqueId(), new playerInfo("noTeam", 0, null, p.getInventory().getContents()));
                                 p.getInventory().clear();
                                 plugin.messagePlayer(p,"Your info:\nTeam: " + plugin.pointSystem.get(p.getUniqueId()).getTeamName() + "\nPoints: " + plugin.pointSystem.get(p.getUniqueId()).getPoints());
+                                p.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
                             } else {
                                 plugin.messagePlayer(p, "You are already playing, use /ca leave to leave the game.");
                             }

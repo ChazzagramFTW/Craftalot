@@ -173,16 +173,23 @@ public class craftalotGUIListener implements Listener {
                             plugin.getConfig().set("craftalot.time-of-day", "night");
                             plugin.saveConfig();
                             guiSettings.setItem(25, menuItems[4]);
+                            if(gameRunning.isGameRunning()){
+                                plugin.getConfig().getLocation("craftalot.game-begin-location").getWorld().setTime(18000);                            }
 
                         } else if (plugin.getConfig().getString("craftalot.time-of-day").equals("night")) {
                             plugin.getConfig().set("craftalot.time-of-day", "day");
                             plugin.saveConfig();
                             guiSettings.setItem(25, menuItems[3]);
+                            if(gameRunning.isGameRunning()){
+                                plugin.getConfig().getLocation("craftalot.game-begin-location").getWorld().setTime(6000);
+                            }
                         } else {
                             plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
                             plugin.getConfig().set("craftalot.time-of-day", "day");
                             plugin.saveConfig();
                             guiSettings.setItem(25, menuItems[3]);
+                            if(gameRunning.isGameRunning()){
+                                plugin.getConfig().getLocation("craftalot.game-begin-location").getWorld().setTime(6000);                            }
                         }
                         break;
                     case 15:
@@ -190,16 +197,49 @@ public class craftalotGUIListener implements Listener {
                             plugin.getConfig().set("craftalot.player-visibility", false);
                             plugin.saveConfig();
                             guiSettings.setItem(24, menuItems[6]);
+                            if(gameRunning.isGameRunning()) {
+                                for(UUID uuid : plugin.pointSystem.keySet()) {
+                                    Player player = Bukkit.getPlayer(uuid);
+                                    for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                                        Player player2 = Bukkit.getPlayer(uuid2);
+                                        if (player != player2) {
+                                            player.hidePlayer(plugin, player2);
+                                        }
+                                    }
+                                }
+                            }
 
                         } else if (plugin.getConfig().getString("craftalot.player-visibility").equals("false")) {
                             plugin.getConfig().set("craftalot.player-visibility", true);
                             plugin.saveConfig();
                             guiSettings.setItem(24, menuItems[5]);
+                            if(gameRunning.isGameRunning()) {
+                                for(UUID uuid : plugin.pointSystem.keySet()) {
+                                    Player player = Bukkit.getPlayer(uuid);
+                                    for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                                        Player player2 = Bukkit.getPlayer(uuid2);
+                                        if (player != player2) {
+                                            player.showPlayer(plugin, player2);
+                                        }
+                                    }
+                                }
+                            }
                         } else {
                             plugin.messagePlayer(p, "Configuration was invalid, corrected to default value.");
                             plugin.getConfig().set("craftalot.player-visibility", true);
                             plugin.saveConfig();
                             guiSettings.setItem(24, menuItems[5]);
+                            if(gameRunning.isGameRunning()) {
+                                for(UUID uuid : plugin.pointSystem.keySet()) {
+                                    Player player = Bukkit.getPlayer(uuid);
+                                    for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                                        Player player2 = Bukkit.getPlayer(uuid2);
+                                        if (player != player2) {
+                                            player.showPlayer(plugin, player2);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         break;
                     case 19:
@@ -403,12 +443,21 @@ public class craftalotGUIListener implements Listener {
                                                     for (int i = 0; i <= 7; i++) {
                                                         if (KitConfig.get().getItemStack("kit.item" + i) != null) {
                                                             player.getInventory().setItem(i, KitConfig.get().getItemStack("kit.item" + i));
+                                                            if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
+                                                                for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                                                                    Player player2 = Bukkit.getPlayer(uuid2);
+                                                                    if(player != player2) {
+                                                                        player.hidePlayer(plugin, player2);
+                                                                    }
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
 
-                                            // Give Kit Function
+                                            if(plugin.getConfig().getString("craftalot.time-of-day").equalsIgnoreCase("day")){ plugin.getConfig().getLocation("craftalot.game-begin-location").getWorld().setTime(6000); }
+                                            if(plugin.getConfig().getString("craftalot.time-of-day").equalsIgnoreCase("night")){ plugin.getConfig().getLocation("craftalot.game-begin-location").getWorld().setTime(18000); }
 
                                             new gameRunning(true, timeLimit, plugin) {
 
@@ -728,7 +777,15 @@ public class craftalotGUIListener implements Listener {
                 }
             }
             if (!blacklisted) {
-                plugin.messagePlayer(player, "Your finishing points: §b&l" + plugin.pointSystem.get(player.getUniqueId()).getPoints() + "pts");
+                if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
+                    for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                        Player player2 = Bukkit.getPlayer(uuid2);
+                        if(player != player2) {
+                            player.showPlayer(plugin, player2);
+                        }
+                    }
+                }
+                plugin.messagePlayer(player, "Your finishing points: §b§l" + plugin.pointSystem.get(player.getUniqueId()).getPoints() + "pts");
                 player.getInventory().clear();
                 player.getInventory().setContents(plugin.pointSystem.get(player.getUniqueId()).getInventoryContent());
                 plugin.pointSystem.remove(player.getUniqueId());
@@ -783,6 +840,7 @@ public class craftalotGUIListener implements Listener {
             }
             MaterialsConfig.get().set("materials." + plugin.selectedRegion.get(p.getUniqueId()) + ".blocks", blocks);
             MaterialsConfig.save();
+            plugin.messagePlayer(p, "The materials list for region '§6" + plugin.selectedRegion.get(p.getUniqueId()) + "§7' has been updated.");
         }
 
         else if (e.getView().getTitle().equalsIgnoreCase("§bKit Configuration")){

@@ -112,8 +112,18 @@ public final class Craftalot extends JavaPlugin implements Listener {
             entity.remove();
         }
         craftalotCommand.despawnEdguard();
-
         if(gameRunning.isGameRunning()){
+            if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
+                for(UUID uuid : plugin.pointSystem.keySet()) {
+                    Player player = Bukkit.getPlayer(uuid);
+                    for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                        Player player2 = Bukkit.getPlayer(uuid2);
+                        if (player != player2) {
+                            player.showPlayer(plugin, player2);
+                        }
+                    }
+                }
+            }
             for(UUID uuid : pointSystem.keySet()){
                 Player p = Bukkit.getPlayer(uuid);
                 plugin.messagePlayer(p, "You have left the game.");
@@ -175,6 +185,14 @@ public final class Craftalot extends JavaPlugin implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player p = event.getPlayer();
         if(pointSystem.containsKey(p.getUniqueId())) {
+            if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
+                for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                    Player player2 = Bukkit.getPlayer(uuid2);
+                    if(p != player2) {
+                        p.showPlayer(plugin, player2);
+                    }
+                }
+            }
             plugin.messagePlayer(p, "You have left the game.");
             p.getInventory().clear();
             p.getInventory().setContents(plugin.pointSystem.get(p.getUniqueId()).getInventoryContent());

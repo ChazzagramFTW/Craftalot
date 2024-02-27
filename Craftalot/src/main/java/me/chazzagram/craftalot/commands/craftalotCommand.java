@@ -476,7 +476,6 @@ public class craftalotCommand implements CommandExecutor {
                                     if (args[1].toLowerCase().equals(key)) {
                                         regionblocks.clear();
                                         plugin.selectedRegion.put(p.getUniqueId(), key);
-                                        plugin.messagePlayer(p, "Materials region '§6" + args[1] + "§7' has been updated with a new region.");
                                         List<String> regionContents = MaterialsConfig.get().getStringList("materials." + args[1] + ".blocks");
                                         for (String regionContent : regionContents) {
                                             Material itemSelected = Material.matchMaterial(regionContent);
