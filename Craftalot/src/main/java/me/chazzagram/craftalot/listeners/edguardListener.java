@@ -38,7 +38,7 @@ public class edguardListener implements Listener {
         Player p = e.getPlayer();
         boolean isGameRunning = gameRunning.isGameRunning();
         if(isGameRunning) {
-            if (e.getRightClicked() == craftalotCommand.edguard) {
+            if (Objects.equals(e.getRightClicked().getCustomName(), "§aEdguard")) {
                 if (plugin.pointSystem.get(p.getUniqueId()).getItemToCraft() == null){
                     plugin.pointSystem.get(p.getUniqueId()).setItemToCraft(randomItem());
                     p.sendMessage("§7[§bEdguard§7] §eHello young squire! I am Edguard and I require your assistance!");

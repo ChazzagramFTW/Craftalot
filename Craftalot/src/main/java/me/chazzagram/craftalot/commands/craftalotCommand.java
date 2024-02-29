@@ -54,7 +54,7 @@ Issues:
 
 public class craftalotCommand implements CommandExecutor {
 
-    static public Entity edguard;
+    public static Entity edguard;
     public static Inventory gui = Bukkit.createInventory(null, 27, "§6Craftalot GUI");
     public static Inventory regionblocks = Bukkit.createInventory(null, 27, "§6Region Blocks");
     static int count = 0;
@@ -95,7 +95,9 @@ public class craftalotCommand implements CommandExecutor {
             schedule = true;
             count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
                 if (!schedule) {
+                    edguard.remove();
                     Bukkit.getScheduler().cancelTask(count);
+
                 } else {
                     edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
                 }
@@ -104,7 +106,8 @@ public class craftalotCommand implements CommandExecutor {
     }
 
     public static void despawnEdguard(){
-        if(edguard != null) {
+        if(schedule) {
+            Bukkit.getScheduler().cancelTask(count);
             schedule = false;
             edguard.remove();
         } else {

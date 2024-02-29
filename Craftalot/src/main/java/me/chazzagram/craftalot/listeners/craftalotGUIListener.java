@@ -34,6 +34,7 @@ public class craftalotGUIListener implements Listener {
     private final Inventory guiSettings;
     public final Inventory guiGameControl;
     public final Inventory guiKitConfig;
+
     static public List<Entity> spawnedEntities = new ArrayList<>();
 
     public int countdownTime;
@@ -257,7 +258,6 @@ public class craftalotGUIListener implements Listener {
                     case 21:
                         if (schedule) {
                             plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
-                            edguard.teleport(p.getLocation());
                             plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
                         } else {
                             plugin.messagePlayer(p, "§aEdguard does not currently exist in the world! Use '/ca edguard spawn' to summon him to your location!");

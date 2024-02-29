@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -98,6 +99,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         getConfig().options().copyDefaults();
         saveDefaultConfig();
+
 
         craftalotCommand.spawnEdguard();
 
@@ -201,7 +203,6 @@ public final class Craftalot extends JavaPlugin implements Listener {
             p.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
         }
     }
-
 
 
 }
