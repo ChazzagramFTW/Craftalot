@@ -47,6 +47,8 @@ public abstract class gameRunning {
         me.chazzagram.craftalot.playerInfo.gameRunning.gamePaused = gamePaused;
     }
 
+    public static int getTimeLeft() { return time; }
+
     public final void startTimer(){
         timer = new BukkitRunnable() {
 

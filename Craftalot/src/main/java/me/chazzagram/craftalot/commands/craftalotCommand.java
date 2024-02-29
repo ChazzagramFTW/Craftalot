@@ -134,7 +134,7 @@ public class craftalotCommand implements CommandExecutor {
                         p.sendMessage("§8§oThis list can be changed in the config.");
                         break;
                     case "version":
-                        plugin.messagePlayer(p, "§8Craftalot Plugin Version: " + PlaceholderAPI.setPlaceholders(p, "%craftalot_version%"));
+                        plugin.messagePlayer(p, "§8Craftalot Plugin Version: " + plugin.getDescription().getVersion());
                         break;
                     case "help":
                         if(args.length > 1) {

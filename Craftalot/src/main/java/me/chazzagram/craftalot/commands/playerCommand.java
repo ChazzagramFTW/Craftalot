@@ -62,9 +62,23 @@ public class playerCommand implements CommandExecutor {
                             plugin.messagePlayer(p, "There is currently no game being played.");
                         }
                         break;
-                }
-            }
-        }
-        return true;
+                    case "help":
+                        p.sendMessage(
+                                """
+                                §7--- Craftalot Player Commands §7---
+                                §6/ca help: §fThis page! Congrats!
+                                §7§oUsage: /craftalot help
+                                §6/ca join: §fJoin an existing game.
+                                §7§oUsage: /craftalot join
+                                §6/ca leave: §fLeave an existing game you are in.
+                                §7§oUsage: /craftalot leave
+                                """);
+                        break;
+        default:
+            plugin.messagePlayer(p, "Invalid arguement. Type '/craftalot help' for the full command list.");
     }
+}
+}
+return true;
+}
 }
