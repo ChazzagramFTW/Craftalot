@@ -4,9 +4,7 @@ import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.files.MaterialsConfig;
-import me.chazzagram.craftalot.playerInfo.gameRunning;
-import me.chazzagram.craftalot.playerInfo.playerInfo;
-import me.chazzagram.craftalot.playerInfo.wandInfo;
+import me.chazzagram.craftalot.playerInfo.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -54,7 +52,6 @@ Issues:
 
 public class craftalotCommand implements CommandExecutor {
 
-    public static Entity edguard;
     public static Inventory gui = Bukkit.createInventory(null, 27, "§6Craftalot GUI");
     public static Inventory regionblocks = Bukkit.createInventory(null, 27, "§6Region Blocks");
     static int count = 0;
@@ -82,38 +79,45 @@ public class craftalotCommand implements CommandExecutor {
         }
     }
 
-    public static void spawnEdguard(){
+//    public static void spawnEdguard(){
+//
+//        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
+//            Entity edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+//
+//            edguard.setGravity(false);
+//            edguard.setCustomName("§aEdguard");
+//            edguard.setCustomNameVisible(true);
+//            edguard.setInvulnerable(true);
+//
+//            schedule = true;
+//            count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+//                if (!schedule) {
+//                    edguard.remove();
+//                    Bukkit.getScheduler().cancelTask(count);
+//
+//                } else {
+//                    edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+//                }
+//            }, 20L, 0);
+//
+//            for(Entity entities : plugin.getConfig().getLocation("craftalot.edguard-location").getChunk().getEntities()){
+//                if(!entities.getUniqueId().equals(edguard.getUniqueId()) && entities.getType().equals(EntityType.VILLAGER) && entities.getName().equals("§aEdguard")){
+//                    entities.remove();
+//                }
+//            }
+//        }
+//    }
 
-        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
-            edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
-
-            edguard.setGravity(false);
-            edguard.setCustomName("§aEdguard");
-            edguard.setCustomNameVisible(true);
-            edguard.setInvulnerable(true);
-
-            schedule = true;
-            count = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-                if (!schedule) {
-                    edguard.remove();
-                    Bukkit.getScheduler().cancelTask(count);
-
-                } else {
-                    edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
-                }
-            }, 20L, 0);
-        }
-    }
-
-    public static void despawnEdguard(){
-        if(schedule) {
-            Bukkit.getScheduler().cancelTask(count);
-            schedule = false;
-            edguard.remove();
-        } else {
-            System.out.println("[Craftalot] Edguard does not exist, despawn is not required.");
-        }
-    }
+//    public static void despawnEdguard(){
+//        if(schedule && edguard != null) {
+//            Bukkit.getScheduler().cancelTask(count);
+//            schedule = false;
+//            edguard.remove();
+//            edguard = null;
+//        } else {
+//            System.out.println("[Craftalot] Edguard does not exist, despawn is not required.");
+//        }
+//    }
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
@@ -211,13 +215,15 @@ public class craftalotCommand implements CommandExecutor {
                         if(args.length > 1) {
                             switch (args[1].toLowerCase()) {
                                 case "spawn":
+                                    if (!edguardInfo.getInstance().isEdguardSpawned()){
 
-                                    if (!schedule){
 
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                                         plugin.saveConfig();
 
-                                        spawnEdguard();
+//                                        spawnEdguard();
+
+                                        edguardInfo.getInstance().spawnEdguard();
 
                                         plugin.messagePlayer(p, "Edguard has been spawned at your location!");
                                     } else {
@@ -226,18 +232,20 @@ public class craftalotCommand implements CommandExecutor {
 
                                     break;
                                 case "despawn":
-                                    if (schedule) {
-                                        despawnEdguard();
+                                    if (edguardInfo.getInstance().isEdguardSpawned()) {
+                                        edguardInfo.getInstance().despawnEdguard();
+                                        plugin.getConfig().set("craftalot.edguard-location", null);
                                         plugin.messagePlayer(p, "Edguard has been despawned!");
                                     } else {
                                         plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/caa edguard spawn' to summon him to your location!");
                                     }
                                     break;
                                 case "movehere":
-                                    if (schedule) {
+
+                                    if (edguardInfo.getInstance().isEdguardSpawned()) {
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                                         plugin.saveConfig();
-                                        edguard.teleport(p.getLocation());
+//                                        edguard.teleport(p.getLocation());
                                         plugin.messagePlayer(p, "Edguard has been teleported to your location!");
                                     } else {
                                         plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/caa edguard spawn' to summon him to your location!");

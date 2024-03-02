@@ -2,28 +2,24 @@ package me.chazzagram.craftalot.listeners;
 
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
-import me.chazzagram.craftalot.files.BlacklistConfig;
 import me.chazzagram.craftalot.files.CraftlistConfig;
 import me.chazzagram.craftalot.files.KitConfig;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 import static me.chazzagram.craftalot.listeners.craftalotGUIListener.convertToDisplayName;
 
 public class edguardListener implements Listener {
 
-    public HashMap<UUID, Material> playerCraft;
 
     private Craftalot plugin;
 

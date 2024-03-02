@@ -3,16 +3,14 @@ package me.chazzagram.craftalot.playerInfo;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.listeners.craftalotGUIListener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
-import static me.chazzagram.craftalot.listeners.craftalotGUIListener.getMenuItems;
 
 public abstract class gameRunning {
 
     private static boolean gameRunning = false;
     private static boolean gamePaused = false;
+
 
     protected static BukkitTask timer;
 
@@ -50,7 +48,7 @@ public abstract class gameRunning {
     public static int getTimeLeft() { return time; }
 
     public final void startTimer(){
-        timer = new BukkitRunnable() {
+            timer = new BukkitRunnable() {
 
             @Override
             public void run() {

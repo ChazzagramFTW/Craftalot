@@ -3,6 +3,7 @@ package me.chazzagram.craftalot.listeners;
 import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.commands.craftalotCommand;
 import me.chazzagram.craftalot.files.*;
+import me.chazzagram.craftalot.playerInfo.edguardInfo;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.settingsInfo;
 import net.md_5.bungee.api.ChatMessageType;
@@ -41,6 +42,7 @@ public class craftalotGUIListener implements Listener {
 
     private int task;
     private final Craftalot plugin;
+
     public HashMap<UUID, settingsInfo> currentSetting;
 
     public craftalotGUIListener(Craftalot plugin) {
@@ -256,7 +258,7 @@ public class craftalotGUIListener implements Listener {
                         plugin.saveConfig();
                         break;
                     case 21:
-                        if (schedule) {
+                        if (edguardInfo.getInstance().isEdguardSpawned()) {
                             plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                             plugin.messagePlayer(p, "§aEdguard has been teleported to your §fcurrent position.");
                         } else {

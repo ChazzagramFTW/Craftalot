@@ -4,6 +4,7 @@ import me.chazzagram.craftalot.commands.*;
 import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.*;
 import me.chazzagram.craftalot.listeners.*;
+import me.chazzagram.craftalot.playerInfo.edguardInfo;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.wandInfo;
@@ -21,6 +22,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
@@ -46,6 +49,9 @@ public final class Craftalot extends JavaPlugin implements Listener {
     public HashMap<UUID, String> selectedRegion;
 
 
+    private edguardInfo edguardInfoInstance;
+
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -56,11 +62,14 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         this.selectedRegion = new HashMap<>();
 
+
         instance = this;
 
         plugin = this;
 
         messageConsole("My first plugin has started, hello.");
+
+        edguardInfo.initInstance(this);
 
 
         getServer().getPluginManager().registerEvents(this, this);
@@ -68,11 +77,12 @@ public final class Craftalot extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new edguardListener(this), this);
         getServer().getPluginManager().registerEvents(new wandListener(this), this);
         getServer().getPluginManager().registerEvents(new PauseListener(this), this);
+        getServer().getPluginManager().registerEvents(edguardInfo.getInstance(), this);
 
         getCommand("craftalotadmin").setExecutor(new craftalotCommand(this));
         getCommand("craftalot").setExecutor(new playerCommand(this));
 
-        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             Bukkit.getPluginManager().registerEvents(this, this);
             new SpigotExpansion(this).register();
         }
@@ -84,7 +94,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         MaterialsConfig.setup();
         MaterialsConfig.get().addDefault("materials", "");
-        MaterialsConfig .get().options().copyDefaults();
+        MaterialsConfig.get().options().copyDefaults();
         MaterialsConfig.save();
 
         BlacklistConfig.setup();
@@ -101,8 +111,9 @@ public final class Craftalot extends JavaPlugin implements Listener {
         saveDefaultConfig();
 
 
-        craftalotCommand.spawnEdguard();
-
+//        craftalotCommand.spawnEdguard();
+        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
+            edguardInfo.getInstance().spawnEdguard();        }
     }
 
     @Override
@@ -113,7 +124,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
         for (Entity entity : spawnedEntities) {
             entity.remove();
         }
-        craftalotCommand.despawnEdguard();
+//        craftalotCommand.despawnEdguard();
         if(gameRunning.isGameRunning()){
             if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
                 for(UUID uuid : plugin.pointSystem.keySet()) {

@@ -1,14 +1,10 @@
-me\chazzagram\craftalot\commands\playerCommand.class
 me\chazzagram\craftalot\playerInfo\gameRunning$1.class
 me\chazzagram\craftalot\listeners\wandListener.class
 me\chazzagram\craftalot\playerInfo\settingsInfo.class
-me\chazzagram\craftalot\files\KitConfig.class
 me\chazzagram\craftalot\listeners\craftalotGUIListener$1$1.class
 me\chazzagram\craftalot\commands\craftalotCommand.class
-me\chazzagram\craftalot\listeners\craftalotGUIListener$1.class
+me\chazzagram\craftalot\playerInfo\edguardInfo$1.class
 me\chazzagram\craftalot\files\BlacklistConfig.class
-me\chazzagram\craftalot\playerInfo\playerInfo.class
-me\chazzagram\craftalot\playerInfo\wandInfo.class
 me\chazzagram\craftalot\Craftalot.class
 me\chazzagram\craftalot\files\MaterialsConfig.class
 me\chazzagram\craftalot\listeners\wandListener$1.class
@@ -16,4 +12,11 @@ me\chazzagram\craftalot\listeners\PauseListener.class
 me\chazzagram\craftalot\expansion\SpigotExpansion.class
 me\chazzagram\craftalot\listeners\craftalotGUIListener.class
 me\chazzagram\craftalot\playerInfo\gameRunning.class
+me\chazzagram\craftalot\commands\playerCommand.class
+me\chazzagram\craftalot\files\KitConfig.class
+me\chazzagram\craftalot\listeners\craftalotGUIListener$1.class
+me\chazzagram\craftalot\playerInfo\playerInfo.class
+me\chazzagram\craftalot\playerInfo\wandInfo.class
+me\chazzagram\craftalot\playerInfo\SharedEdguard.class
+me\chazzagram\craftalot\playerInfo\edguardInfo.class
 me\chazzagram\craftalot\listeners\edguardListener.class
