@@ -18,6 +18,8 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -59,7 +61,7 @@ public class craftalotCommand implements CommandExecutor {
     boolean regionExists = false;
     static public boolean schedule = false;
 
-    private static Craftalot plugin;
+    private final Craftalot plugin;
 
     public craftalotCommand(Craftalot plugin) {
         this.plugin = plugin;
@@ -122,6 +124,7 @@ public class craftalotCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
 
+
         if (commandSender instanceof Player p) {
 
             if (args.length == 0) {
@@ -152,7 +155,7 @@ public class craftalotCommand implements CommandExecutor {
                                                     §6/caa wand: §fWand tool for region setup.
                                                     §7§oUsage: /craftalotadmin wand
                                                     §6/caa edguard: §fCommand to control the item collector Edguard.
-                                                    §7§oUsage: /craftalotadmin edguard {spawn,despawn,movehere}
+                                                    §7§oUsage: /craftalotadmin edguard {spawn,despawn,respawn,movehere}
                                                     §6/caa gui: §fOpen the gui interface to control the game.\s
                                                     §7§oUsage: /craftalotadmin gui
                                                     §6/caa reload: §fReloads the craftlist in the config.
@@ -215,7 +218,7 @@ public class craftalotCommand implements CommandExecutor {
                         if(args.length > 1) {
                             switch (args[1].toLowerCase()) {
                                 case "spawn":
-                                    if (!edguardInfo.getInstance().isEdguardSpawned()){
+                                    if (!plugin.edguardSpawned){
 
 
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
@@ -223,7 +226,25 @@ public class craftalotCommand implements CommandExecutor {
 
 //                                        spawnEdguard();
 
-                                        edguardInfo.getInstance().spawnEdguard();
+                                        if(!plugin.edguardSpawned) {
+                                            plugin.edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+
+                                            plugin.edguard.setGravity(false);
+                                            plugin.edguard.setCustomName("§aEdguard");
+                                            plugin.edguard.setCustomNameVisible(true);
+                                            plugin.edguard.setInvulnerable(true);
+
+                                            plugin.edguardSpawned = true;
+
+                                            plugin.timer = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    if (plugin.edguard != null && plugin.edguardSpawned) {
+                                                        plugin.edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                                                    }
+                                                }
+                                            }, 20L, 0L);
+                                        }
 
                                         plugin.messagePlayer(p, "Edguard has been spawned at your location!");
                                     } else {
@@ -232,17 +253,78 @@ public class craftalotCommand implements CommandExecutor {
 
                                     break;
                                 case "despawn":
-                                    if (edguardInfo.getInstance().isEdguardSpawned()) {
-                                        edguardInfo.getInstance().despawnEdguard();
+                                    if (plugin.edguardSpawned) {
+                                        plugin.edguard.remove();
+                                        Bukkit.getScheduler().cancelTask(plugin.timer);
+                                        plugin.edguardSpawned = false;
                                         plugin.getConfig().set("craftalot.edguard-location", null);
                                         plugin.messagePlayer(p, "Edguard has been despawned!");
                                     } else {
                                         plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/caa edguard spawn' to summon him to your location!");
                                     }
                                     break;
+                                case "respawn":
+                                    if (plugin.edguardSpawned) {
+                                        plugin.edguard.remove();
+                                        Bukkit.getScheduler().cancelTask(plugin.timer);
+                                        plugin.edguardSpawned = false;
+
+                                        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
+
+                                            if (!plugin.edguardSpawned) {
+                                                plugin.edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+
+                                                plugin.edguard.setGravity(false);
+                                                plugin.edguard.setCustomName("§aEdguard");
+                                                plugin.edguard.setCustomNameVisible(true);
+                                                plugin.edguard.setInvulnerable(true);
+
+                                                plugin.edguardSpawned = true;
+
+                                                plugin.timer = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if (plugin.edguard != null && plugin.edguardSpawned) {
+                                                            plugin.edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                                                        }
+                                                    }
+                                                }, 20L, 0L);
+                                            }
+                                            plugin.messagePlayer(p, "Edguard has been respawned at your location!");
+                                        } else {
+                                            plugin.messagePlayer(p, "There is no edguard location setup, use /caa edguard spawn to spawn edguard.");
+                                        }
+                                    } else {
+                                        if (plugin.getConfig().getLocation("craftalot.edguard-location") == null) {
+                                            plugin.messagePlayer(p, "Edguard does not currently exist in the world! Use '/caa edguard spawn' to summon him to your location!");
+                                        } else {
+                                            if (!plugin.edguardSpawned) {
+                                                plugin.edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+
+                                                plugin.edguard.setGravity(false);
+                                                plugin.edguard.setCustomName("§aEdguard");
+                                                plugin.edguard.setCustomNameVisible(true);
+                                                plugin.edguard.setInvulnerable(true);
+
+                                                plugin.edguardSpawned = true;
+
+                                                plugin.timer = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if (plugin.edguard != null && plugin.edguardSpawned) {
+                                                            plugin.edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                                                        }
+                                                    }
+                                                }, 20L, 0L);
+                                            }
+
+                                            plugin.messagePlayer(p, "Edguard has been respawned at your location!");
+                                        }
+                                    }
+                                    break;
                                 case "movehere":
 
-                                    if (edguardInfo.getInstance().isEdguardSpawned()) {
+                                    if (plugin.edguardSpawned) {
                                         plugin.getConfig().set("craftalot.edguard-location", p.getLocation());
                                         plugin.saveConfig();
 //                                        edguard.teleport(p.getLocation());

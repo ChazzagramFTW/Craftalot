@@ -4,7 +4,6 @@ import me.chazzagram.craftalot.commands.*;
 import me.chazzagram.craftalot.expansion.SpigotExpansion;
 import me.chazzagram.craftalot.files.*;
 import me.chazzagram.craftalot.listeners.*;
-import me.chazzagram.craftalot.playerInfo.edguardInfo;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
 import me.chazzagram.craftalot.playerInfo.wandInfo;
@@ -17,14 +16,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -39,6 +42,8 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
     private static Craftalot instance;
 
+    public Entity edguard;
+
     public static Craftalot getInstance(){
         return instance;
     }
@@ -48,8 +53,11 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
     public HashMap<UUID, String> selectedRegion;
 
+//    private edguardInfo edguardInfo;
 
-    private edguardInfo edguardInfoInstance;
+    public boolean edguardSpawned;
+
+    public int timer;
 
 
     @Override
@@ -62,6 +70,7 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         this.selectedRegion = new HashMap<>();
 
+//        edguardInfo = new edguardInfo(this);
 
         instance = this;
 
@@ -69,15 +78,13 @@ public final class Craftalot extends JavaPlugin implements Listener {
 
         messageConsole("My first plugin has started, hello.");
 
-        edguardInfo.initInstance(this);
-
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new craftalotGUIListener(this), this);
         getServer().getPluginManager().registerEvents(new edguardListener(this), this);
         getServer().getPluginManager().registerEvents(new wandListener(this), this);
         getServer().getPluginManager().registerEvents(new PauseListener(this), this);
-        getServer().getPluginManager().registerEvents(edguardInfo.getInstance(), this);
+//        getServer().getPluginManager().registerEvents(new edguardInfo(this), this);
 
         getCommand("craftalotadmin").setExecutor(new craftalotCommand(this));
         getCommand("craftalot").setExecutor(new playerCommand(this));
@@ -111,19 +118,81 @@ public final class Craftalot extends JavaPlugin implements Listener {
         saveDefaultConfig();
 
 
-//        craftalotCommand.spawnEdguard();
-        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
-            edguardInfo.getInstance().spawnEdguard();        }
+        if(plugin.getConfig().getLocation("craftalot.edguard-location") != null){
+            messageConsole("Edguard needs to be respawned! Use /reload or /caa edguard respawn.");
+        }
+
+
     }
+
+
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+        if (event.getPlugin() == plugin) {
+            if(!Bukkit.getOnlinePlayers().isEmpty()) {
+                if(edguardSpawned) {
+                    edguard.remove();
+                    Bukkit.getScheduler().cancelTask(timer);
+                    edguardSpawned = false;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPluginEnable(PluginEnableEvent event) {
+        if (event.getPlugin() == plugin) {
+            if(!Bukkit.getOnlinePlayers().isEmpty()) {
+                if (plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
+                    if(!edguardSpawned) {
+                        edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+
+                        edguard.setGravity(false);
+                        edguard.setCustomName("§aEdguard");
+                        edguard.setCustomNameVisible(true);
+                        edguard.setInvulnerable(true);
+
+                        edguardSpawned = true;
+
+                        timer = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+                            @Override
+                            public void run() {
+                                if (edguard != null && edguardSpawned) {
+                                    edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                                }
+                            }
+                        }, 20L, 0L);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+//        craftalotCommand.spawnEdguard();
+
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         messageConsole("My first plugin has stopped, bye.");
 
+        if(edguardSpawned){
+            edguard.remove();
+            Bukkit.getScheduler().cancelTask(timer);
+            edguardSpawned = false;
+        }
+
+
+
         for (Entity entity : spawnedEntities) {
             entity.remove();
         }
+
+
+
 //        craftalotCommand.despawnEdguard();
         if(gameRunning.isGameRunning()){
             if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
