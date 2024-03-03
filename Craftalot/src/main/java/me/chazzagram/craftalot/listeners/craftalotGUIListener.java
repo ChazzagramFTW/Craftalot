@@ -329,7 +329,7 @@ public class craftalotGUIListener implements Listener {
                             plugin.messagePlayer(p, "Game cannot start, material-restock-delay has not been configured.");
                             break;
                         }
-                        if (!schedule) {
+                        if (!plugin.edguardSpawned) {
                             plugin.messagePlayer(p, "Game cannot start, edguard has not been spawned.");
                             break;
                         }
