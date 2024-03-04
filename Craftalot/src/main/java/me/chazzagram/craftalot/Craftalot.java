@@ -24,6 +24,8 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -218,6 +220,49 @@ public final class Craftalot extends JavaPlugin implements Listener {
         }
 
     }
+
+
+//    chunk listeners for edguard.
+    @EventHandler
+    public void chunkUnload(ChunkUnloadEvent event) {
+        if (plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
+            if (event.getChunk() == plugin.getConfig().getLocation("craftalot.edguard-location").getChunk()) {
+                if(edguardSpawned) {
+                    edguard.remove();
+                    Bukkit.getScheduler().cancelTask(timer);
+                    edguardSpawned = false;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void chunkLoad(ChunkLoadEvent event) {
+        if (plugin.getConfig().getLocation("craftalot.edguard-location") != null) {
+            if (event.getChunk() == plugin.getConfig().getLocation("craftalot.edguard-location").getChunk()) {
+                if (!edguardSpawned) {
+                    edguard = plugin.getConfig().getLocation("craftalot.edguard-location").getWorld().spawnEntity(plugin.getConfig().getLocation("craftalot.edguard-location"), EntityType.VILLAGER);
+
+                    edguard.setGravity(false);
+                    edguard.setCustomName("§aEdguard");
+                    edguard.setCustomNameVisible(true);
+                    edguard.setInvulnerable(true);
+
+                    edguardSpawned = true;
+
+                    timer = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+                        @Override
+                        public void run() {
+                            if (edguard != null && edguardSpawned) {
+                                edguard.teleport(plugin.getConfig().getLocation("craftalot.edguard-location"));
+                            }
+                        }
+                    }, 20L, 0L);
+                }
+            }
+        }
+    }
+
 
     public static Craftalot getPlugin() {
         return plugin;

@@ -309,28 +309,28 @@ public class craftalotGUIListener implements Listener {
                         if (CraftlistConfig.get().isConfigurationSection("craftlist")) {
                             ConfigurationSection craftlistSection = CraftlistConfig.get().getConfigurationSection("craftlist");
                             if (craftlistSection.getKeys(false).isEmpty()) {
-                                plugin.messagePlayer(p, "Game cannot start, the craftlist is empty! Configure this in /ca gui.");
+                                plugin.messagePlayer(p, "Game cannot start, the §acraftlist §7is empty! Configure this in §a/ca gui.");
                                 break;
                             }
                         }
                         if(CraftlistConfig.get().getKeys(false).isEmpty()){
-                            plugin.messagePlayer(p, "Game cannot start, the craftlist is empty! Configure this in /ca gui.");
+                            plugin.messagePlayer(p, "Game cannot start, the §acraftlist §7is empty! Configure this in §a/ca gui.");
                             break;
                         }
                         if (plugin.getConfig().get("craftalot.lobby-location") == null) {
-                            plugin.messagePlayer(p, "Game cannot start, lobby-location has not been configured.");
+                            plugin.messagePlayer(p, "Game cannot start, §alobby-location §7has not been configured.");
                             break;
                         }
                         if (plugin.getConfig().get("craftalot.game-begin-location") == null) {
-                            plugin.messagePlayer(p, "Game cannot start, game-begin-location has not been configured.");
+                            plugin.messagePlayer(p, "Game cannot start, §agame-begin-location §7has not been configured.");
                             break;
                         }
                         if (plugin.getConfig().get("craftalot.material-restock-delay") == null) {
-                            plugin.messagePlayer(p, "Game cannot start, material-restock-delay has not been configured.");
+                            plugin.messagePlayer(p, "Game cannot start, §amaterial-restock-delay §7has not been configured.");
                             break;
                         }
                         if (!plugin.edguardSpawned) {
-                            plugin.messagePlayer(p, "Game cannot start, edguard has not been spawned.");
+                            plugin.messagePlayer(p, "Game cannot start, §aedguard §7has not been spawned.");
                             break;
                         }
                         ItemStack[] menuItems = getMenuItems();
@@ -339,9 +339,8 @@ public class craftalotGUIListener implements Listener {
                             boolean blacklisted = false;
 
                             for(Player all : Bukkit.getServer().getOnlinePlayers()){
-                                plugin.messagePlayer(all, "A craftalot game is starting in ~30 seconds! Use /ca join to join the game.");
+                                plugin.messagePlayer(all, "A craftalot game is starting in ~30 seconds! Use §a/ca join §7to join the game.");
                             }
-
 
                             for (UUID uuid : plugin.pointSystem.keySet()) {
                                 Player player = Bukkit.getPlayer(uuid);
@@ -354,7 +353,7 @@ public class craftalotGUIListener implements Listener {
                                 if (!blacklisted) {
                                     plugin.pointSystem.put(player.getUniqueId(), new playerInfo("noTeam", 0, null, player.getInventory().getContents()));
                                     player.getInventory().clear();
-                                    plugin.messagePlayer(player,"Your info:\nTeam: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + "\nPoints: " + plugin.pointSystem.get(player.getUniqueId()).getPoints());
+                                    plugin.messagePlayer(player, "Your info:\nTeam: " + plugin.pointSystem.get(player.getUniqueId()).getTeamName() + "\nPoints: " + plugin.pointSystem.get(player.getUniqueId()).getPoints());
                                 }
                             }
                             gameRunning.setGameRunning(true);
@@ -445,7 +444,7 @@ public class craftalotGUIListener implements Listener {
                                                     for (int i = 0; i <= 7; i++) {
                                                         if (KitConfig.get().getItemStack("kit.item" + i) != null) {
                                                             player.getInventory().setItem(i, KitConfig.get().getItemStack("kit.item" + i));
-                                                            if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
+                                                            if(!plugin.getConfig().getBoolean("craftalot.player-visibility")) {
                                                                 for (UUID uuid2 : plugin.pointSystem.keySet()) {
                                                                     Player player2 = Bukkit.getPlayer(uuid2);
                                                                     if(player != player2) {
@@ -765,8 +764,12 @@ public class craftalotGUIListener implements Listener {
 
         List<String> blackList = BlacklistConfig.get().getStringList("blacklisted-players");
 
-        for (UUID uuid : plugin.pointSystem.keySet()) {
+
+        Iterator<UUID> iterator = plugin.pointSystem.keySet().iterator();
+        while (iterator.hasNext()) {
+            UUID uuid = iterator.next();
             Player player = Bukkit.getPlayer(uuid);
+
             plugin.messagePlayer(player, "§c§lGAME OVER!");
             boolean blacklisted = false;
             if (!plugin.getConfig().getKeys(true).isEmpty()) {
@@ -780,7 +783,9 @@ public class craftalotGUIListener implements Listener {
             }
             if (!blacklisted) {
                 if(plugin.getConfig().getBoolean("craftalot.player-visibility")) {
-                    for (UUID uuid2 : plugin.pointSystem.keySet()) {
+                    Iterator<UUID> iterator2 = plugin.pointSystem.keySet().iterator();
+                    while (iterator2.hasNext()) {
+                        UUID uuid2 = iterator2.next();
                         Player player2 = Bukkit.getPlayer(uuid2);
                         if(player != player2) {
                             player.showPlayer(plugin, player2);
@@ -790,11 +795,33 @@ public class craftalotGUIListener implements Listener {
                 plugin.messagePlayer(player, "Your finishing points: §b§l" + plugin.pointSystem.get(player.getUniqueId()).getPoints() + "pts");
                 player.getInventory().clear();
                 player.getInventory().setContents(plugin.pointSystem.get(player.getUniqueId()).getInventoryContent());
-                plugin.pointSystem.remove(player.getUniqueId());
                 player.setGameMode(GameMode.SURVIVAL);
                 player.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
             }
+
         }
+
+        iterator = plugin.pointSystem.keySet().iterator();
+        while (iterator.hasNext()) {
+            UUID uuid = iterator.next();
+            Player player = Bukkit.getPlayer(uuid);
+
+            plugin.messagePlayer(player, "§c§lGAME OVER!");
+            boolean blacklisted = false;
+            if (!plugin.getConfig().getKeys(true).isEmpty()) {
+                for (String uuidString : blackList) {
+                    UUID blacklistuuid = UUID.fromString(uuidString);
+                    if (blacklistuuid.equals(player.getUniqueId())) {
+                        blacklisted = true;
+                        break;
+                    }
+                }
+            }
+            if (!blacklisted) {
+                iterator.remove();
+            }
+        }
+
         if(!spawnedEntities.isEmpty()) {
             for (Entity ent : spawnedEntities) {
                 ent.remove();

@@ -4,6 +4,7 @@ import me.chazzagram.craftalot.Craftalot;
 import me.chazzagram.craftalot.listeners.craftalotGUIListener;
 import me.chazzagram.craftalot.playerInfo.gameRunning;
 import me.chazzagram.craftalot.playerInfo.playerInfo;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -53,6 +54,12 @@ public class playerCommand implements CommandExecutor {
                                 p.getInventory().clear();
                                 p.getInventory().setContents(plugin.pointSystem.get(p.getUniqueId()).getInventoryContent());
                                 plugin.pointSystem.remove(p.getUniqueId());
+                                for(UUID uuid : plugin.pointSystem.keySet()){
+                                    Player player = Bukkit.getPlayer(uuid);
+
+                                    p.showPlayer(plugin, player);
+                                    player.showPlayer(plugin, p);
+                                }
                                 p.setGameMode(GameMode.SURVIVAL);
                                 p.teleport(plugin.getConfig().getLocation("craftalot.lobby-location"));
                             } else {
